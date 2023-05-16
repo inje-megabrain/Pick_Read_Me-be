@@ -1,45 +1,70 @@
 package com.example.Pick_Read_Me.Domain;
 
 
+import com.example.Pick_Read_Me.oauth2.SocialType;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Getter
-@Builder
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@Builder
+@Table(name = "MEMBERS")
+@AllArgsConstructor
 public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id", nullable = false)
-    private long id;
+    @Column(name = "github_id")
+    private Long id;
 
-    @Column(name = "name", length = 200)
-    private String name;
+    private String email; // 이메일
+    private String password; // 비밀번호
+    private String nickname; // 닉네임
+    private String imageUrl; // 프로필 이미지
+    private int age;
+    private String city; // 사는 도시
 
-    @Column(name = "password")
-    private String password;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-    @Column(name = "nickname", length = 50, nullable = false)
-    private String nickname;
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType; // KAKAO, NAVER, GOOGLE
 
-    @Column(name = "tel", length = 20)
-    private String tel;
+    private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
 
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created", nullable = false, updatable = false)
-    private Date created;
+    private String refreshToken; // 리프레시 토큰
 
-    @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated", nullable = false)
-    private Date updated;
+    // 유저 권한 설정 메소드
+    public void authorizeUser() {
+        this.role = Role.USER;
+    }
 
+    // 비밀번호 암호화 메소드
+    public void passwordEncode(PasswordEncoder passwordEncoder) {
+        this.password = passwordEncoder.encode(this.password);
+    }
+
+    //== 유저 필드 업데이트 ==//
+    public void updateNickname(String updateNickname) {
+        this.nickname = updateNickname;
+    }
+
+    public void updateAge(int updateAge) {
+        this.age = updateAge;
+    }
+
+    public void updateCity(String updateCity) {
+        this.city = updateCity;
+    }
+
+    public void updatePassword(String updatePassword, PasswordEncoder passwordEncoder) {
+        this.password = passwordEncoder.encode(updatePassword);
+    }
+
+    public void updateRefreshToken(String updateRefreshToken) {
+        this.refreshToken = updateRefreshToken;
+    }
 }
