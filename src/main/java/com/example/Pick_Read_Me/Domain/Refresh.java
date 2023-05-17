@@ -12,9 +12,8 @@ import javax.persistence.*;
 @Entity
 public class Refresh {
     @Id
-    @GeneratedValue
     @Column(name = "refresh_id")
-    private Long refreshId;
+    private Long id;
 
     @OneToOne(mappedBy = "refresh")
     private Member member;

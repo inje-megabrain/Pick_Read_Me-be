@@ -22,11 +22,11 @@ public class QRefresh extends EntityPathBase<Refresh> {
 
     public static final QRefresh refresh = new QRefresh("refresh");
 
+    public final NumberPath<Long> id = createNumber("id", Long.class);
+
     public final StringPath ip = createString("ip");
 
     public final QMember member;
-
-    public final NumberPath<Long> refreshId = createNumber("refreshId", Long.class);
 
     public final StringPath refreshToken = createString("refreshToken");
 

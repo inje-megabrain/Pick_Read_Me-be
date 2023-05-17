@@ -1,5 +1,6 @@
 package com.example.Pick_Read_Me.Service;
 
+
 import com.example.Pick_Read_Me.Domain.Member;
 import com.example.Pick_Read_Me.Domain.Refresh;
 import com.example.Pick_Read_Me.Jwt.JwtProvider;
@@ -16,15 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -51,96 +47,78 @@ public class OauthService {
     @Autowired
     private RefreshRepository refreshRepository;
 
+
     public String getToken(String code) {
         String accessTokenUrl = "https://github.com/login/oauth/access_token";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Accept", "application/json");
 
         // 액세스 토큰 요청 파라미터 설정
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
         requestBody.add("client_id", clientId);
         requestBody.add("client_secret", clientSecret);
         requestBody.add("code", code);
-        requestBody.add("redirect_uri", redirectUri);
 
-        // 액세스 토큰 요청 수행
-        WebClient.RequestBodySpec request = webClientBuilder.build().post().uri(URI.create(accessTokenUrl));
-        WebClient.ResponseSpec responseSpec = request
-                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .body(BodyInserters.fromFormData(requestBody))
-                .retrieve();
+        RestTemplate restTemplate = new RestTemplate();
+        // 액세스 토큰 요청
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
+        ResponseEntity<Map> responseEntity = restTemplate.exchange(accessTokenUrl, HttpMethod.POST, requestEntity, Map.class);
+        Map<String, String> responseBody = responseEntity.getBody();
 
-
-        // 액세스 토큰 응답 처리
-        ResponseEntity<String> responseEntity = responseSpec.toEntity(String.class).block();
-        if (responseEntity != null && responseEntity.getStatusCode().is2xxSuccessful()) {
-            String accessTokenResponse = responseEntity.getBody();
-            String accessToken = parseAccessToken(accessTokenResponse);
-            // 추가적인 처리 로직 작성
-            return accessToken;
-        } else {
-            // 액세스 토큰 요청이 실패한 경우 처리 로직 작성
-            return String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        // 액세스 토큰 추출
+        return responseBody.get("access_token");
     }
 
-    private String parseAccessToken(String accessTokenResponse) {
-        Gson gson = new Gson();
-        JsonObject responseJson = gson.fromJson(accessTokenResponse, JsonObject.class);
-        String accessToken = responseJson.get("access_token").getAsString();    //access_token 값만 가져오기
-        return accessToken;
-    }
 
     public ResponseEntity<String> getUserInfo(String accessToken) throws Exception {
-        if (accessToken == null || accessToken.isEmpty()) {
-            // 액세스 토큰이 없는 경우 처리 로직 작성
-            throw new Exception("Access token not found");
-        }
-        else {
-            String userInfoUrl = "https://api.github.com/user";
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + accessToken);
-            HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+        String userInfoUrl = "https://api.github.com/user";
 
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String> responseEntity = restTemplate.exchange(userInfoUrl, HttpMethod.GET, requestEntity, String.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
 
-            if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                // API 응답 처리 로직 작성
-                //return ResponseEntity.ok(responseEntity.getBody());
-                Gson gson = new Gson();
-                JsonObject responseJson = gson.fromJson(responseEntity.getBody(), JsonObject.class);
-                if (checkMember(memberRepository.findById(responseJson.get("id").getAsLong()))) {
-                    HashMap<String, String> h = new HashMap<>();
-                    h = saveMember(responseJson);
+        // 사용자 정보 요청
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(userInfoUrl, HttpMethod.GET, requestEntity, String.class);
 
-                    HttpHeaders header = new HttpHeaders();
-                    headers.add("accessToken", h.get("accessToken"));
-                    headers.add("refreshToken", h.get("refreshToken"));
-                    String responseData = "Response data";
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            //return ResponseEntity.ok(responseEntity.getBody());
+            Gson gson = new Gson();
+            JsonObject responseJson = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+            if (checkMember(memberRepository.findById(responseJson.get("id").getAsLong()))) {
+                HashMap<String, String> h = new HashMap<>();
+                h = saveMember(responseJson);
 
-                    return ResponseEntity.ok()
-                            .headers(headers)
-                            .body(responseData);
-                }
-                else{
-                    HashMap<String, String> h = new HashMap<>();
-                    h = sendToken(responseJson);
+                HttpHeaders header = new HttpHeaders();
+                headers.add("accessToken", h.get("accessToken"));
+                headers.add("refreshToken", h.get("refreshToken"));
+                String responseData = "Response data";
 
-                    HttpHeaders header = new HttpHeaders();
-                    headers.add("accessToken", h.get("accessToken"));
-                    headers.add("refreshToken", h.get("refreshToken"));
-                    String responseData = "Response data";
-
-                    return ResponseEntity.ok()
-                            .headers(headers)
-                            .body(responseData);
-                }
-            } else {
-                // API 요청이 실패한 경우 처리 로직 작성
-                throw new Exception("API 요청 실패");
+                return ResponseEntity.ok()
+                        .headers(headers)
+                        .body(responseData);
             }
+            else{
+                HashMap<String, String> h = new HashMap<>();
+                h = sendToken(responseJson);
+
+                HttpHeaders header = new HttpHeaders();
+                headers.add("accessToken", h.get("accessToken"));
+                headers.add("refreshToken", h.get("refreshToken"));
+                String responseData = "Response data";
+
+                return ResponseEntity.ok()
+                        .headers(headers)
+                        .body(responseData);
+            }
+        } else {
+            // API 요청이 실패한 경우 처리 로직 작성
+            throw new Exception("API 요청 실패");
         }
     }
+
+
 
     private HashMap<String, String> sendToken(JsonObject responseJson) {
         HashMap<String, String> m = new HashMap<>();
@@ -196,6 +174,7 @@ public class OauthService {
         refresh.setRefreshToken(refreshToken);
 
         refresh.setMember(member);
+
         refreshRepository.save(refresh);
         memberRepository.save(member);
 
@@ -210,3 +189,5 @@ public class OauthService {
         return ipAddress;
     }
 }
+
+

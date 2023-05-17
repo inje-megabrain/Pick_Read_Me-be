@@ -2,7 +2,12 @@ package com.example.Pick_Read_Me.Config;
 
 import com.example.Pick_Read_Me.Jwt.JwtAuthenticationFilter;
 import com.example.Pick_Read_Me.Jwt.JwtProvider;
+import com.example.Pick_Read_Me.Repository.RefreshRepository;
+import com.example.Pick_Read_Me.Service.CustomOAuth2UserService;
+import com.example.Pick_Read_Me.Service.OAuth2SuccessHandler;
 import com.example.Pick_Read_Me.Util.CookieUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,21 +20,29 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final CustomOAuth2UserService oAuth2UserService;
+    private final OAuth2SuccessHandler successHandler;
+    private final JwtProvider tokenService;
+
+    @Autowired
+    private CustomOAuth2UserService customOAuth2UserService;
+    private final RefreshRepository refreshRepository;
+
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    JwtAuthenticationFilter jwtAuthenticationFilter(JwtProvider jwtProvider, CookieUtil cookieUtil) {
-        return new JwtAuthenticationFilter(jwtProvider, cookieUtil);
+    JwtAuthenticationFilter jwtAuthenticationFilter(JwtProvider jwtProvider, CookieUtil cookieUtil, RefreshRepository refreshRepository) {
+        return new JwtAuthenticationFilter(jwtProvider, cookieUtil, refreshRepository);
     }
 
 
+
     @Bean
-    protected SecurityFilterChain config(HttpSecurity http,
-                                         JwtProvider jwtProvider,
+    protected SecurityFilterChain config(HttpSecurity http, JwtProvider jwtProvider,
                                          CookieUtil cookieUtil) throws Exception {
         http
                 .httpBasic().disable()
@@ -37,18 +50,23 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/auth/**").permitAll()
-                .antMatchers("/oauth2/**").permitAll()
-                .antMatchers("/api/**").hasAuthority("[USER]")
+                .antMatchers("/token/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
+                .addFilterBefore(jwtAuthenticationFilter(jwtProvider, cookieUtil, refreshRepository),
+                        UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login()
                 .authorizationEndpoint()
-                .baseUri("/login");
-
-        http.addFilterBefore(jwtAuthenticationFilter(jwtProvider, cookieUtil),
-                UsernamePasswordAuthenticationFilter.class);
+                .baseUri("/login")
+                .and()
+                .redirectionEndpoint()
+                .baseUri("/auth/code")
+                .and()
+                .successHandler(successHandler)
+                .userInfoEndpoint()
+                .userService(customOAuth2UserService);
 
         return http.build();
+
     }
 }

@@ -1,6 +1,7 @@
 package com.example.Pick_Read_Me.Controller;
 
 
+import com.example.Pick_Read_Me.Service.CustomOAuth2UserService;
 import com.example.Pick_Read_Me.Service.OauthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +38,17 @@ public class GitHubOAuthController {
 
     @Value("${spring.security.oauth2.client.registration.github.redirect-uri}")
     private String redirectUri;
+    @Autowired
+    private CustomOAuth2UserService customOAuth2UserService;
 
     @GetMapping(value = "code")
-    public ResponseEntity<String> getToken(@RequestParam("code") String code) throws Exception {
-        return oauthService.getUserInfo(oauthService.getToken(code));
+    public String getToken(@RequestParam("code") String code) throws Exception {
+
+
+
+        return "!";
     }
+
 }
+
+

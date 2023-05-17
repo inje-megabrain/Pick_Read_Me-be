@@ -11,3 +11,4 @@ public class Details extends User { //Authentication 객체 생성 super()을 �
                 AuthorityUtils.createAuthorityList(String.valueOf(member.getRoles())));
     }
 }
+

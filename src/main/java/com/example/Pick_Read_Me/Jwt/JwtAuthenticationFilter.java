@@ -1,5 +1,6 @@
 package com.example.Pick_Read_Me.Jwt;
 
+
 import com.example.Pick_Read_Me.Domain.Refresh;
 import com.example.Pick_Read_Me.Repository.RefreshRepository;
 import com.example.Pick_Read_Me.Util.CookieUtil;
@@ -25,8 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
     private final CookieUtil cookieUtil;
-    @Autowired
-    private RefreshRepository refreshRepository;
+    private final RefreshRepository refreshRepository;
 
     //1번 필터
     @Override
@@ -36,16 +36,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String refreshToken = null;
         Authentication authenticate;
         //사용자의 principal과 credential 정보를 Authentication에 담는다
-
+        log.info("Jwt");
         accessToken =  req.getHeader("accessToken");
-
+        log.info(accessToken);
         if(accessToken==null || jwtProvider.isTokenExpired(accessToken)) {
             refreshToken = req.getHeader("refreshToken");
-
+            log.info(refreshToken);
             if (refreshToken != null || !jwtProvider.RefreshisTokenExpired(refreshToken)) {
                 Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(refreshToken));
-                Refresh refresh = refreshRepository.findById(github_id).orElseGet(Refresh::new);
+                log.info(String.valueOf(github_id));
 
+                Refresh refresh =  refreshRepository.findById(github_id).orElseGet(Refresh::new);
+                log.info(refresh.getRefreshToken());
+                log.info(refresh.getIp());
                 if (refresh.getRefreshToken().equals(refreshToken) && refresh.getIp().equals(req.getRemoteAddr())) {
                     try {
                         authenticate = jwtProvider.authenticate(new UsernamePasswordAuthenticationToken(github_id, ""));
@@ -61,7 +64,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     refreshToken = jwtProvider.generateRefreshToken(m);
 
                     refresh.setRefreshToken(refreshToken);
-                    refresh.setRefreshId(refresh.getRefreshId());
+                    refresh.setId(refresh.getId());
                     refreshRepository.save(refresh);
 
                 } else {
@@ -86,3 +89,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
 }
+

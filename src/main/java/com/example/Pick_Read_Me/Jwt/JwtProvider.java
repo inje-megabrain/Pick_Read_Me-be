@@ -19,7 +19,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 @Component
@@ -65,10 +64,9 @@ public class JwtProvider implements AuthenticationProvider {
                 .build();
     }
 
-    public String generateToken(String id) {
-        HashMap<String, String> m = new HashMap<>();
-        m.put("githubId", id);
-        return doGenerateToken(TOKEN_VALIDATION_SECOND, m);
+    public String generateToken(Map<String, String> payload) {
+
+        return doGenerateToken(TOKEN_VALIDATION_SECOND, payload);
     }
 
     public String generateRefreshToken(Map<String, String> payload) {
