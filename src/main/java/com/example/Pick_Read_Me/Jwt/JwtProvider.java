@@ -114,9 +114,11 @@ public class JwtProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
-        Details userDetails = (Details) userDetailsService.loadUserByUsername
-                ((String) authentication.getPrincipal());
-
+        log.info(String.valueOf(authentication));
+        log.info("Authentication username: " + authentication.getPrincipal());
+        Details userDetails = (Details) userDetailsService.loadUserByUsername(String.valueOf(authentication.getPrincipal()));
+        log.info("User details: " + userDetails);
+        log.info(String.valueOf(userDetails));
         return new UsernamePasswordAuthenticationToken(
                 userDetails.getUsername(),
                 userDetails.getPassword(),

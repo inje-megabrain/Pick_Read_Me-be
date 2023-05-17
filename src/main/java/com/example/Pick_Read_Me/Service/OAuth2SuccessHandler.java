@@ -85,9 +85,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
 
         log.info("{}", token);
-        targetUrl = UriComponentsBuilder.fromUriString("/home")
-                .queryParam("token", "token")
-                .build().toUriString();
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("/home")
+                .queryParam("accessToken", token.getAccessToken())
+                .queryParam("refreshToken", token.getRefreshToken());
+        String redirectUrl = uriBuilder.toUriString();
+        getRedirectStrategy().sendRedirect(request, response, redirectUrl);
+
     }
 }

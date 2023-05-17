@@ -41,20 +41,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         log.info(accessToken);
         if(accessToken==null || jwtProvider.isTokenExpired(accessToken)) {
             refreshToken = req.getHeader("refreshToken");
-            log.info(refreshToken);
+            log.info("리프레시::"+refreshToken);
             if (refreshToken != null || !jwtProvider.RefreshisTokenExpired(refreshToken)) {
                 Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(refreshToken));
                 log.info(String.valueOf(github_id));
 
                 Refresh refresh =  refreshRepository.findById(github_id).orElseGet(Refresh::new);
-                log.info(refresh.getRefreshToken());
+                log.info("refersh :: "+refresh.getRefreshToken());
                 log.info(refresh.getIp());
+                log.info(req.getRemoteAddr());
                 if (refresh.getRefreshToken().equals(refreshToken) && refresh.getIp().equals(req.getRemoteAddr())) {
                     try {
                         authenticate = jwtProvider.authenticate(new UsernamePasswordAuthenticationToken(github_id, ""));
                         SecurityContextHolder.getContext().setAuthentication(authenticate);
                     }catch(Exception e){
-                        throw new RuntimeException("다시 로그인 하세요.!");
+                        throw new RuntimeException("authenticate 오류!");
                     }
 
                     HashMap<String, String> m = new HashMap<>();

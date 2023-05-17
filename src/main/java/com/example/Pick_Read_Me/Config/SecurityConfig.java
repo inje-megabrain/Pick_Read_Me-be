@@ -39,6 +39,11 @@ public class SecurityConfig {
         return new JwtAuthenticationFilter(jwtProvider, cookieUtil, refreshRepository);
     }
 
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {  //해당 URL은 필터 거치지 않겠다
+        return (web -> web.ignoring().antMatchers("/home", "/home/**"));
+        //return (web -> web.ignoring().antMatchers("/test"));
+    }
 
 
     @Bean
@@ -50,7 +55,7 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/token/**").permitAll()
+                .antMatchers("/home/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter(jwtProvider, cookieUtil, refreshRepository),
