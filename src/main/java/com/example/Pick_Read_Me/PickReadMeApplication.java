@@ -10,5 +10,3 @@ public class PickReadMeApplication {
 		SpringApplication.run(PickReadMeApplication.class, args);
 	}
 }
-
-//wntj
