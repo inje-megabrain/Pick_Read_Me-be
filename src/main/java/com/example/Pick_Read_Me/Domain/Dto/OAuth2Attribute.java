@@ -1,4 +1,4 @@
-package com.example.Pick_Read_Me.Domain;
+package com.example.Pick_Read_Me.Domain.Dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;
