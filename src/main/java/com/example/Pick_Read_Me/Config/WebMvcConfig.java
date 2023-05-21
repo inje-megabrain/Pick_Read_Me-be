@@ -14,7 +14,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry
                 .addMapping("/**")
-                .allowedOriginPatterns("http://localhost:8080") // 허용할 origin 패턴 설정
+                .allowedOriginPatterns("**") // 허용할 origin 패턴 설정
                 .allowedMethods("GET", "POST", "PUT", "DELETE") // 허용되는 Method
                 .allowedHeaders("*") // 허용되는 헤더
                 .allowCredentials(true) // 자격증명 허용
