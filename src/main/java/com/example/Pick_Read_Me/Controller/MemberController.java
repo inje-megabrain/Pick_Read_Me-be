@@ -38,5 +38,8 @@ public class MemberController {
         // 응답을 생성하여 반환합니다.
         return "1";
     }
-
+    @GetMapping("/test")
+    public String test() {
+        return "test url입니다. 서버 정상 가동중";
+    }
 }
