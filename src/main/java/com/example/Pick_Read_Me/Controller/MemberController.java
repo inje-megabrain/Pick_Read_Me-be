@@ -41,5 +41,6 @@ public class MemberController {
     @GetMapping("/test")
     public String test() {
         return "test url입니다. 서버 정상 가동중";
+        /**/
     }
 }
