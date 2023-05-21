@@ -56,7 +56,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/home/**").permitAll()
-                .antMatchers("/test/**").permitAll()
+                .antMatchers("/test").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter(jwtProvider, cookieUtil, refreshRepository),

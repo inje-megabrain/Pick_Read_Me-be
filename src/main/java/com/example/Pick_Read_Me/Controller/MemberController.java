@@ -44,4 +44,10 @@ public class MemberController {
         /**/
         /**/
     }
+    @GetMapping("/p")
+    public String test1() {
+        return "test url입니다. 서버 정상 가동중!";
+        /**/
+        /**/
+    }
 }
