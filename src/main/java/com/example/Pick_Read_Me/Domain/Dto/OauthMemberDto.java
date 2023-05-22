@@ -21,5 +21,6 @@ public class OauthMemberDto {
     private String name;
     private String email;
     private Date created;
+    private String repo;
     private List<String> roles = new ArrayList<>();
 }

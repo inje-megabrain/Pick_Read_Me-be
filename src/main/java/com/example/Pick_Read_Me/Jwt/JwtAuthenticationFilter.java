@@ -32,6 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
 
+
         String accessToken = null;
         String refreshToken = null;
         Authentication authenticate;
@@ -72,7 +73,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     throw new RuntimeException("등록한 IP가 다릅니다 다시 로그인해주세요!");
                 }
             } else {
-                throw new RuntimeException("다시로그인 하세요");
+                throw new RuntimeException("다시로그인 하세요 토큰이 없어요!");
             }
         }
         else if(accessToken!=null && !jwtProvider.isTokenExpired(accessToken)){

@@ -3,6 +3,8 @@ package com.example.Pick_Read_Me.Controller;
 
 
 import com.example.Pick_Read_Me.Repository.MemberRepository;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,14 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 public class MemberController {
     private final MemberRepository userRepository;
 
-    @GetMapping("/member")
-    public String p(){
-        return "1";
-    }
-    @GetMapping("/oauth2/callback/github")
-    public String a() {
-        return "1";
-    }
+
 
     @GetMapping("/home")
     public String home(HttpServletRequest request, HttpServletResponse response,
@@ -38,13 +33,18 @@ public class MemberController {
         // 응답을 생성하여 반환합니다.
         return "1";
     }
+    @Operation(summary = "test server", description = "서버가 가동중인지 테스트하는 코드입니다.\nToken필요 X")
     @GetMapping("/test")
     public String test() {
         return "test url입니다. 서버 정상 가동중";
 
     }
-    @GetMapping("/p")
-    public String test1() {
+    @Operation(summary = "test server", description = "서버가 가동중인지 테스트하는 코드입니다\n" +
+    "Token이 맞을때만 리턴합니다.")
+    @GetMapping("/token/test")
+    public String test1(HttpServletRequest request) {
+        System.out.println(request.getHeader("accessToken"));
+        System.out.println(request.getHeader("refreshToken"));
         return "test url입니다!!. 서버 정상 가동중!";
 
     }

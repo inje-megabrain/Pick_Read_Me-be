@@ -26,12 +26,26 @@ public class SecurityConfig {
     private final OAuth2SuccessHandler successHandler;
     private final JwtProvider tokenService;
 
+    private String[] permitList={
+            "/v2/**",
+            "/v3/**",
+            "/configuration",
+            "/swagger-ui/**",
+            "/webjars/**",
+            "/swagger-resources/**",
+            "/home/**",
+            "/test",
+            "/api/**",
+            "/login",
+            "/home?accessToken=*",
+            "/home\\?accessToken=.*",
+    };
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
     private final RefreshRepository refreshRepository;
 
     @Bean
-    PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
@@ -41,7 +55,7 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {  //해당 URL은 필터 거치지 않겠다
-        return (web -> web.ignoring().antMatchers("/home", "/home/**", "/test"));
+        return (web -> web.ignoring().antMatchers(permitList));
         //return (web -> web.ignoring().antMatchers("/test"));
     }
 
@@ -55,8 +69,7 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/home/**").permitAll()
-                .antMatchers("/test").permitAll()
+                .antMatchers(permitList).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter(jwtProvider, cookieUtil, refreshRepository),

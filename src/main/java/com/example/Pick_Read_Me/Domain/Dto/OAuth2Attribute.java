@@ -16,7 +16,7 @@ public class OAuth2Attribute {
     private String attributeKey;
     private String email;
     private String name;
-
+    private String repo;
     private Long id;
 
     public static OAuth2Attribute of(String provider, String attributeKey,
@@ -36,8 +36,9 @@ public class OAuth2Attribute {
         Integer id = (Integer) attributes.get("id");
         return OAuth2Attribute.builder()
                 .id(Long.valueOf(id))
-                .name((String) attributes.get("Name"))
+                .name((String) attributes.get("login"))
                 .email((String) attributes.get("email"))
+                .repo((String) attributes.get("repo"))
                 .attributes(attributes)
                 .attributeKey(attributeKey)
                 .build();
@@ -50,6 +51,7 @@ public class OAuth2Attribute {
         map.put("name", name);
         map.put("email", email);
         map.put("id", id);
+        map.put("repo", repo);
 
         return map;
     }

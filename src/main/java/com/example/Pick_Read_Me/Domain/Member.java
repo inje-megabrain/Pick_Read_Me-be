@@ -39,6 +39,9 @@ public class Member implements UserDetails {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "repo")
+    private String repo;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created", nullable = false, updatable = false)
@@ -52,6 +55,11 @@ public class Member implements UserDetails {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated", nullable = false)
     private Date updated;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL,  orphanRemoval=true)
+    private List<Post> posts = new ArrayList<>();
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles.stream()
