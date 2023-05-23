@@ -12,4 +12,10 @@ public class PostsDTO {
     private String content;
 
     private String repo;
+
+    public PostsDTO(String title, String content, String repo) {
+        this.title = title;
+        this.content = content;
+        this.repo = repo;
+    }
 }

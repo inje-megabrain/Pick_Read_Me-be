@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.*;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,6 +49,7 @@ public class MemberController {
         return "test url입니다. 서버 정상 가동중";
 
     }
+
     @Operation(summary = "test server", description = "서버가 가동중인지 테스트하는 코드입니다\n" +
     "Token이 맞을때만 리턴합니다.")
     @GetMapping("/token/test")
@@ -55,7 +57,6 @@ public class MemberController {
         System.out.println(request.getHeader("accessToken"));
         System.out.println(request.getHeader("refreshToken"));
         return "test url입니다!!. 서버 정상 가동중!";
-
     }
-    /**/
+
 }

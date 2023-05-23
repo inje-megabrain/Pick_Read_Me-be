@@ -1,19 +1,37 @@
 package com.example.Pick_Read_Me.Service;
 
+import com.example.Pick_Read_Me.BasicResponse;
+import com.example.Pick_Read_Me.Domain.Dto.PostDto.GetPostDto;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.PostsDTO;
+import com.example.Pick_Read_Me.Domain.Dto.PostDto.SelectAllPost;
 import com.example.Pick_Read_Me.Domain.Entity.Member;
 import com.example.Pick_Read_Me.Domain.Entity.Post;
+import com.example.Pick_Read_Me.Domain.Entity.QPost;
 import com.example.Pick_Read_Me.Exception.MemberNotFoundException;
+import com.example.Pick_Read_Me.Jwt.JwtProvider;
 import com.example.Pick_Read_Me.Repository.MemberRepository;
 import com.example.Pick_Read_Me.Repository.PostRepository;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.example.Pick_Read_Me.Domain.Entity.QPost.post;
 
 @Service
 @Slf4j
@@ -24,7 +42,26 @@ public class PostService {
 
     @Autowired
     private MemberRepository memberRepository;
-    public String getReadMe(Long github_id, String repo_name) {
+
+    @Autowired
+    private JwtProvider jwtProvider;
+
+    /*
+    private final EntityManager em;
+
+    private final JPAQueryFactory query;
+
+    public PostService(EntityManager em, JPAQueryFactory query) {
+        this.em = em;
+        this.query = new JPAQueryFactory(em);
+    }
+
+     */
+
+    public String getReadMe(HttpServletRequest request, String repo_name) {
+        String token = request.getHeader("accessToken");
+        Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(token));
+
         Member member = memberRepository.findById(github_id).orElseGet(Member::new);
         RestTemplate restTemplate = new RestTemplate();
 
@@ -53,9 +90,12 @@ public class PostService {
         }
     }
 
-    public Post createPost(Long githubId, PostsDTO postsDTO) {
-        Member member = memberRepository.findById(githubId)
-                .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + githubId));
+    public Post createPost(HttpServletRequest request, PostsDTO postsDTO) {
+        String token = request.getHeader("accessToken");
+        Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(token));
+
+        Member member = memberRepository.findById(github_id)
+                .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
 
         Post post = new Post();
         post.setContent(postsDTO.getContent());
@@ -63,6 +103,7 @@ public class PostService {
         post.setPostCreatedAt(new Date());
         post.setPostUpdatedAt(new Date());
         post.setRepo(postsDTO.getRepo());
+        post.setPost_like(0L);
         post.setMember(member);
 
         member.getPosts().add(post);
@@ -72,4 +113,136 @@ public class PostService {
 
         return post;
     }
+
+    public List<Post> selectAllPost(HttpServletRequest request) {
+        String token = request.getHeader("accessToken");
+        Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(token));
+        Member member = memberRepository.findById(github_id)
+                .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
+        return member.getPosts();
+    }
+
+    public ResponseEntity<GetPostDto> selectPost(Long post_id) {
+
+        Post post = postRepository.findById(post_id)
+                .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + post_id));
+        GetPostDto getPostDto = new GetPostDto(
+          post.getId(), post.getTitle(), post.getContent(),post.getPostCreatedAt(), post.getPostUpdatedAt(),
+          post.getRepo(), post.getPost_like(), post.getLikedMembers(), post.getMember()
+        );
+        return new ResponseEntity<GetPostDto>(getPostDto, HttpStatus.valueOf(200));
+    }
+
+    public boolean deletePost(HttpServletRequest request, Long post_id) {
+        String token = request.getHeader("accessToken");
+        Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(token));
+
+        Member member = memberRepository.findById(github_id)
+                .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
+
+        Post post = postRepository.findById(post_id)
+                .orElseThrow(() -> new MemberNotFoundException("Post not found with id: " + post_id));
+        try{
+            postRepository.deleteById(post_id);
+            member.getPosts().remove(post);
+
+            memberRepository.save(member);
+            return true;
+        }catch(Exception e) {
+            return false;
+        }
+    }
+
+    @Transactional
+    public Post postLikes(HttpServletRequest request, Long post_id) {    //글 좋아요
+        String token = request.getHeader("accessToken");
+        Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(token));
+
+        Optional<Post> optionalPost = postRepository.findById(post_id);
+        if (!optionalPost.isPresent()) {  //아이디 없을시 예외처리
+            throw new NoSuchElementException("post_id의 값이 DB에 존재하지 않습니다:" + post_id);
+        }
+        Post post = optionalPost.get();
+
+        Optional<Member> optionalMember = memberRepository.findById(github_id);
+        if (!optionalMember.isPresent()) {  //아이디 없을시 예외처리
+            throw new NoSuchElementException("DB에 존재하지 않는 ID : " + github_id);
+        }
+        Member member = optionalMember.get(); //존재한다면 객체 생성
+
+        if (post.getLikedMembers().contains(member)) {
+            post.removeLike(member);
+        } else {
+            post.addLike(member);
+        }
+
+        Post savePost = postRepository.save(post);
+
+        return savePost;
+    }
+
+    @Transactional
+    public ResponseEntity<PostsDTO> updatePost(Long post_id, PostsDTO postsDTO) {
+        Post post = postRepository.findById(post_id).orElseGet(Post::new);
+        post.setPostUpdatedAt(new Date());
+        post.setContent(postsDTO.getContent());
+        post.setRepo(post.getRepo());
+        post.setTitle(post.getTitle());
+
+        PostsDTO postsDTO1 = new PostsDTO(
+            postsDTO.getTitle(),postsDTO.getContent(), postsDTO.getRepo()
+        );
+        postRepository.save(post);
+
+        return new ResponseEntity<PostsDTO>(postsDTO1, HttpStatus.valueOf(200));
+    }
+
+    /*
+    public Slice<SelectAllPost> searchBySlice(Long PostId,Pageable pageable)
+    {
+
+        List<SelectAllPost> results = query
+                .select(Projections.fields(SelectAllPost.class,
+                        post.id.as("post_id"), post.content.as("content"),
+                        post.post_like.as("post_like"),post.title.as("title"),
+                        post.postUpdatedAt.as("postUpdateAt"), post.repo.as("repo")))
+                .from(post)
+                .where(
+                        // no-offset --> 요청한 lastPostId부터 Index가 시작됩니다
+                        lastPostId(PostId)
+                )
+                .orderBy(post.id.desc())
+                .limit(pageable.getPageSize()+1) //limit에서 요청한 페이지 사이즈보다 +1을 해서 조회하는 것입니다
+                .fetch();
+
+        //페이지가 마지막인지 체크
+        return checkLastPage(pageable, results);
+    }
+
+    // no-offset 방식 처리하는 메서드
+    private BooleanExpression lastPostId(Long PostId) {
+        if (PostId==null || PostId==0) {
+            return null;
+        }
+        return post.id.lt(PostId);
+    }
+
+    // 무한 스크롤 방식 처리하는 메서드
+    private Slice<SelectAllPost> checkLastPage(Pageable pageable, List<SelectAllPost> results) {
+
+        boolean hasNext = false;
+
+        //만약 조회한 글이 화면에 보여줄 글보다 갯수가 많으면
+        if (results.size() > pageable.getPageSize()) {  //result.size()는 조회한 글 갯수
+            //pageable 화면에 보여줄 글 갯수
+
+            hasNext = true;	//다음 글이 있다고 체크
+            results.remove(pageable.getPageSize());	//result에 확인용으로 추가한 +1의 글을
+            //지워줍니다
+        }
+
+        return new SliceImpl<>(results, pageable, hasNext);
+    }
+
+     */
 }

@@ -26,7 +26,11 @@ public class QPost extends EntityPathBase<Post> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final ListPath<Member, QMember> likedMembers = this.<Member, QMember>createList("likedMembers", Member.class, QMember.class, PathInits.DIRECT2);
+
     public final QMember member;
+
+    public final NumberPath<Long> post_like = createNumber("post_like", Long.class);
 
     public final DateTimePath<java.util.Date> postCreatedAt = createDateTime("postCreatedAt", java.util.Date.class);
 

@@ -28,6 +28,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final ListPath<Post, QPost> likedPosts = this.<Post, QPost>createList("likedPosts", Post.class, QPost.class, PathInits.DIRECT2);
+
     public final StringPath name = createString("name");
 
     public final StringPath password = createString("password");

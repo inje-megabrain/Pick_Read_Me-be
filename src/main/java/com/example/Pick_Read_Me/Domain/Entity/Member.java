@@ -55,6 +55,16 @@ public class Member implements UserDetails {
     @Column(name = "updated", nullable = false)
     private Date updated;
 
+    @Builder.Default
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "post_like",
+            joinColumns = @JoinColumn(name = "github_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id")
+    )
+    private List<Post> likedPosts = new ArrayList<>();
+
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL,  orphanRemoval=true)
     @JsonIgnore
     private List<Post> posts = new ArrayList<>();
