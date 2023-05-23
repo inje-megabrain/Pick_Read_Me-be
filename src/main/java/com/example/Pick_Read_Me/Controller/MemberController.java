@@ -15,6 +15,8 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Log4j2
@@ -29,13 +31,16 @@ public class MemberController {
     public void home(HttpServletRequest request, HttpServletResponse response,
                      @RequestParam("accessToken") String accessToken,
                      @RequestParam("refreshToken") String refreshToken) throws IOException {
-        String redirectUrl = "http://localhost:3000/redirect"; // 리다이렉션할 URL
+        String encodedAccessToken = URLEncoder.encode(accessToken, StandardCharsets.UTF_8);
+        String encodedRefreshToken = URLEncoder.encode(refreshToken, StandardCharsets.UTF_8);
+        String redirectUrl = "http://localhost:3000/redirect?accessToken=" + encodedAccessToken + "&refreshToken=" + encodedRefreshToken;
 
         // accessToken, refreshToken 등 필요한 작업 수행
-        response.setHeader("accessToken", accessToken);
-        response.addHeader("refreshToken", refreshToken);
+
         response.sendRedirect(redirectUrl);
     }
+
+
 
     @Operation(summary = "test server", description = "서버가 가동중인지 테스트하는 코드입니다.\nToken필요 X")
     @GetMapping("/test")
