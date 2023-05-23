@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 public interface RefreshRepository extends JpaRepository<Refresh, Long> {
 
     /*
-    
+
      */
 }
 
