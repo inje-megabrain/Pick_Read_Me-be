@@ -1,9 +1,10 @@
-package com.example.Pick_Read_Me.Domain;
+package com.example.Pick_Read_Me.Domain.Entity;
 
 import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 
 @Getter
 @Builder
@@ -24,11 +25,13 @@ public class Post {
     private String content;
 
     @Column(name = "post_created_at")
-    private Timestamp postCreatedAt;
+    private Date postCreatedAt;
 
     @Column(name = "post_update_at")
-    private Timestamp postUpdatedAt;
+    private Date postUpdatedAt;
 
+    @Column(name = "repo")
+    private String repo;
     @ManyToOne()
     @JoinColumn(name = "member_id") //글을쓴 Member_id
     private Member member;

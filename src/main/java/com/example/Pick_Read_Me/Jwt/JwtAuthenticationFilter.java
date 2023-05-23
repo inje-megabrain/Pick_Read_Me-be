@@ -1,13 +1,11 @@
 package com.example.Pick_Read_Me.Jwt;
 
 
-import com.example.Pick_Read_Me.Domain.Refresh;
+import com.example.Pick_Read_Me.Domain.Entity.Refresh;
 import com.example.Pick_Read_Me.Repository.RefreshRepository;
 import com.example.Pick_Read_Me.Util.CookieUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

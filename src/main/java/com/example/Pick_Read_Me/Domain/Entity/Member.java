@@ -1,5 +1,6 @@
-package com.example.Pick_Read_Me.Domain;
+package com.example.Pick_Read_Me.Domain.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -31,6 +32,7 @@ public class Member implements UserDetails {
 
     @OneToOne
     @JoinColumn(name = "id")
+    @JsonIgnore
     private Refresh refresh;
 
     @Column(name ="email")
@@ -38,9 +40,6 @@ public class Member implements UserDetails {
 
     @Column(name = "password")
     private String password;
-
-    @Column(name = "repo")
-    private String repo;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -57,8 +56,13 @@ public class Member implements UserDetails {
     private Date updated;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL,  orphanRemoval=true)
+    @JsonIgnore
     private List<Post> posts = new ArrayList<>();
 
+
+    public void UpdatePosts(Post post) {
+        this.posts.add(post);
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -1,4 +1,4 @@
-package com.example.Pick_Read_Me.Domain;
+package com.example.Pick_Read_Me.Domain.Entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -16,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QPost extends EntityPathBase<Post> {
 
-    private static final long serialVersionUID = 1224900560L;
+    private static final long serialVersionUID = -1712653637L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
@@ -28,9 +28,11 @@ public class QPost extends EntityPathBase<Post> {
 
     public final QMember member;
 
-    public final DateTimePath<java.sql.Timestamp> postCreatedAt = createDateTime("postCreatedAt", java.sql.Timestamp.class);
+    public final DateTimePath<java.util.Date> postCreatedAt = createDateTime("postCreatedAt", java.util.Date.class);
 
-    public final DateTimePath<java.sql.Timestamp> postUpdatedAt = createDateTime("postUpdatedAt", java.sql.Timestamp.class);
+    public final DateTimePath<java.util.Date> postUpdatedAt = createDateTime("postUpdatedAt", java.util.Date.class);
+
+    public final StringPath repo = createString("repo");
 
     public final StringPath title = createString("title");
 

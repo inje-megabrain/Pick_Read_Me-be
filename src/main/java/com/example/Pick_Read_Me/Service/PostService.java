@@ -1,18 +1,22 @@
 package com.example.Pick_Read_Me.Service;
 
-import com.example.Pick_Read_Me.Domain.Member;
+import com.example.Pick_Read_Me.Domain.Dto.PostDto.PostsDTO;
+import com.example.Pick_Read_Me.Domain.Entity.Member;
+import com.example.Pick_Read_Me.Domain.Entity.Post;
+import com.example.Pick_Read_Me.Exception.MemberNotFoundException;
 import com.example.Pick_Read_Me.Repository.MemberRepository;
 import com.example.Pick_Read_Me.Repository.PostRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Map;
+import java.util.*;
 
 @Service
+@Slf4j
 public class PostService {
 
     @Autowired
@@ -47,5 +51,25 @@ public class PostService {
             // API 요청이 실패한 경우 에러 처리
             throw new RuntimeException("Failed to fetch README from GitHub API");
         }
+    }
+
+    public Post createPost(Long githubId, PostsDTO postsDTO) {
+        Member member = memberRepository.findById(githubId)
+                .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + githubId));
+
+        Post post = new Post();
+        post.setContent(postsDTO.getContent());
+        post.setTitle(postsDTO.getTitle());
+        post.setPostCreatedAt(new Date());
+        post.setPostUpdatedAt(new Date());
+        post.setRepo(postsDTO.getRepo());
+        post.setMember(member);
+
+        member.getPosts().add(post);
+
+        postRepository.save(post);
+        memberRepository.save(member);
+
+        return post;
     }
 }

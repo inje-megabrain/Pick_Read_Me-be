@@ -1,4 +1,4 @@
-package com.example.Pick_Read_Me.Domain.Dto;
+package com.example.Pick_Read_Me.Domain.Dto.OAuthDto;
 
 import lombok.AccessLevel;
 import lombok.Builder;

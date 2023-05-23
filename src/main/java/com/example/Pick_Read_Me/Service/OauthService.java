@@ -1,8 +1,9 @@
 package com.example.Pick_Read_Me.Service;
 
 
-import com.example.Pick_Read_Me.Domain.Member;
-import com.example.Pick_Read_Me.Domain.Refresh;
+
+import com.example.Pick_Read_Me.Domain.Entity.Member;
+import com.example.Pick_Read_Me.Domain.Entity.Refresh;
 import com.example.Pick_Read_Me.Jwt.JwtProvider;
 import com.example.Pick_Read_Me.Repository.MemberRepository;
 import com.example.Pick_Read_Me.Repository.RefreshRepository;

@@ -1,10 +1,10 @@
 package com.example.Pick_Read_Me.Service;
 
 
-import com.example.Pick_Read_Me.Domain.Dto.OauthMemberDto;
-import com.example.Pick_Read_Me.Domain.Dto.Token;
-import com.example.Pick_Read_Me.Domain.Member;
-import com.example.Pick_Read_Me.Domain.Refresh;
+import com.example.Pick_Read_Me.Domain.Dto.OAuthDto.OauthMemberDto;
+import com.example.Pick_Read_Me.Domain.Dto.OAuthDto.Token;
+import com.example.Pick_Read_Me.Domain.Entity.Member;
+import com.example.Pick_Read_Me.Domain.Entity.Refresh;
 import com.example.Pick_Read_Me.Jwt.JwtProvider;
 import com.example.Pick_Read_Me.Repository.MemberRepository;
 import com.example.Pick_Read_Me.Repository.RefreshRepository;
@@ -72,7 +72,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             Refresh refresh = new Refresh();
 
             Member member = new Member();
-            member.setRepo((String) oAuth2User.getAttributes().get("repo"));
             member.setUpdated(new Date());
 
             refresh.setMember(member);
@@ -113,7 +112,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 member.setId((Long) oAuth2User.getAttributes().get("id"));
                 member.setName(String.valueOf(oAuth2User.getAttributes().get("name")));
                 member.setEmail(String.valueOf(oAuth2User.getAttributes().get("email")));
-                member.setRepo((String) oAuth2User.getAttributes().get("repo"));
                 member.setCreated(new Date());
                 member.setUpdated(new Date());
                 member.setRoles(Collections.singletonList("USER"));
