@@ -46,17 +46,13 @@ public class PostService {
     @Autowired
     private JwtProvider jwtProvider;
 
-    /*
     private final EntityManager em;
-
     private final JPAQueryFactory query;
 
     public PostService(EntityManager em, JPAQueryFactory query) {
         this.em = em;
         this.query = new JPAQueryFactory(em);
     }
-
-     */
 
     public String getReadMe(HttpServletRequest request, String repo_name) {
         String token = request.getHeader("accessToken");
@@ -67,7 +63,7 @@ public class PostService {
 
         String apiUrl = String.format("https://api.github.com/repos/"+member.getName()+"/"+
                 repo_name+"/readme");
-
+        log.info(apiUrl);
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent", "Your-User-Agent"); // GitHub API 요청 시 User-Agent 헤더 필요
 
@@ -125,7 +121,7 @@ public class PostService {
     public ResponseEntity<GetPostDto> selectPost(Long post_id) {
 
         Post post = postRepository.findById(post_id)
-                .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + post_id));
+                .orElseThrow(() -> new MemberNotFoundException("post not found with id: " + post_id));
         GetPostDto getPostDto = new GetPostDto(
           post.getId(), post.getTitle(), post.getContent(),post.getPostCreatedAt(), post.getPostUpdatedAt(),
           post.getRepo(), post.getPost_like(), post.getLikedMembers(), post.getMember()
@@ -186,8 +182,8 @@ public class PostService {
         Post post = postRepository.findById(post_id).orElseGet(Post::new);
         post.setPostUpdatedAt(new Date());
         post.setContent(postsDTO.getContent());
-        post.setRepo(post.getRepo());
-        post.setTitle(post.getTitle());
+        post.setRepo(postsDTO.getRepo());
+        post.setTitle(postsDTO.getTitle());
 
         PostsDTO postsDTO1 = new PostsDTO(
             postsDTO.getTitle(),postsDTO.getContent(), postsDTO.getRepo()
@@ -197,52 +193,41 @@ public class PostService {
         return new ResponseEntity<PostsDTO>(postsDTO1, HttpStatus.valueOf(200));
     }
 
-    /*
-    public Slice<SelectAllPost> searchBySlice(Long PostId,Pageable pageable)
-    {
 
-        List<SelectAllPost> results = query
-                .select(Projections.fields(SelectAllPost.class,
-                        post.id.as("post_id"), post.content.as("content"),
-                        post.post_like.as("post_like"),post.title.as("title"),
-                        post.postUpdatedAt.as("postUpdateAt"), post.repo.as("repo")))
-                .from(post)
+
+    public Slice<Post> searchByPost(HttpServletRequest request,  Pageable pageable) {
+
+        String token = request.getHeader("accessToken");
+        String github_id = jwtProvider.getGithubIdFromToken(token);
+
+        Optional<Member> optionalMember = memberRepository.findById(Long.valueOf(github_id));
+        if (!optionalMember.isPresent()) {  //아이디 없을시 예외처리
+            throw new NoSuchElementException("DB에 존재하지 않는 ID : " + github_id);
+        }
+        Member member = optionalMember.get(); //존재한다면 객체 생성
+
+
+        List<Post> results = query.selectFrom(post)
                 .where(
-                        // no-offset --> 요청한 lastPostId부터 Index가 시작됩니다
-                        lastPostId(PostId)
+                        post.member.notIn(member)
                 )
-                .orderBy(post.id.desc())
-                .limit(pageable.getPageSize()+1) //limit에서 요청한 페이지 사이즈보다 +1을 해서 조회하는 것입니다
+                .orderBy(Expressions.numberTemplate(Double.class, "function('rand')").asc())
+                .limit(pageable.getPageSize()+1)
                 .fetch();
 
-        //페이지가 마지막인지 체크
         return checkLastPage(pageable, results);
     }
 
-    // no-offset 방식 처리하는 메서드
-    private BooleanExpression lastPostId(Long PostId) {
-        if (PostId==null || PostId==0) {
-            return null;
-        }
-        return post.id.lt(PostId);
-    }
-
-    // 무한 스크롤 방식 처리하는 메서드
-    private Slice<SelectAllPost> checkLastPage(Pageable pageable, List<SelectAllPost> results) {
+    private Slice<Post> checkLastPage(Pageable pageable, List<Post> results) {
 
         boolean hasNext = false;
 
-        //만약 조회한 글이 화면에 보여줄 글보다 갯수가 많으면
-        if (results.size() > pageable.getPageSize()) {  //result.size()는 조회한 글 갯수
-            //pageable 화면에 보여줄 글 갯수
-
-            hasNext = true;	//다음 글이 있다고 체크
-            results.remove(pageable.getPageSize());	//result에 확인용으로 추가한 +1의 글을
-            //지워줍니다
+        // 조회한 결과 개수가 요청한 페이지 사이즈보다 크면 뒤에 더 있음, next = true
+        if (results.size() > pageable.getPageSize()) {
+            hasNext = true;
+            results.remove(pageable.getPageSize());
         }
 
         return new SliceImpl<>(results, pageable, hasNext);
     }
-
-     */
 }

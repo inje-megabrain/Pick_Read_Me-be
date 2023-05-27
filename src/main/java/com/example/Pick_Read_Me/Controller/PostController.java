@@ -2,7 +2,6 @@ package com.example.Pick_Read_Me.Controller;
 
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.GetPostDto;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.PostsDTO;
-import com.example.Pick_Read_Me.Domain.Dto.PostDto.SelectAllPost;
 import com.example.Pick_Read_Me.Domain.Entity.Post;
 import com.example.Pick_Read_Me.Jwt.JwtProvider;
 import com.example.Pick_Read_Me.Service.PostService;
@@ -95,12 +94,13 @@ public class PostController {
         return postService.updatePost(post_id, postsDTO);
     }
 
-    /*
-    @GetMapping("/post/mywrite")
-    public Slice<SelectAllPost> getPosts(@RequestParam Long start) {
-        return postService.searchBySlice(start, PageRequest.ofSize(6));
+    @Operation(summary = "게시글 랜덤 무한스크롤 API", description = "게시글을 골라 수정할 수 있습니다.\n" +
+            "page는 한 페이지당 얼마만큼의 게시글을 보여줄지 정할 수 있습니다")
+    @GetMapping("/get/rand/posts")
+    public Slice<Post> getPosts(HttpServletRequest request,
+                                @RequestParam int page) {
+        return postService.searchByPost(request,  PageRequest.ofSize(page));
     }
 
-     */
 
 }

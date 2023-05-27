@@ -2,13 +2,18 @@ package com.example.Pick_Read_Me.Controller;
 
 
 
+import com.example.Pick_Read_Me.Domain.Dto.OAuthDto.GetMemberDto;
 import com.example.Pick_Read_Me.Repository.MemberRepository;
+import com.example.Pick_Read_Me.Service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -23,8 +28,14 @@ import java.util.Map;
 @Log4j2
 @RestController
 @RequiredArgsConstructor
+
 public class MemberController {
-    private final MemberRepository userRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
+    private MemberService memberService;
 
 
 
@@ -41,10 +52,8 @@ public class MemberController {
         response.sendRedirect(redirectUrl);
     }
 
-
-
     @Operation(summary = "test server", description = "서버가 가동중인지 테스트하는 코드입니다.\nToken필요 X")
-    @GetMapping("/test")
+    @GetMapping("/api/test")
     public String test() {
         return "test url입니다. 서버 정상 가동중";
 
@@ -59,4 +68,9 @@ public class MemberController {
         return "test url입니다!!. 서버 정상 가동중!";
     }
 
+    @Operation(summary = "해당 유저 조회", description = "헤더를 주면 헤더를 까서 DB에서 조회합니다")
+    @GetMapping("/get/members")
+    public ResponseEntity<GetMemberDto> getMembers(HttpServletRequest request) {
+        return memberService.getMembers(request);
+    }
 }

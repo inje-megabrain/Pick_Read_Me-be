@@ -1,5 +1,6 @@
 package com.example.Pick_Read_Me.Domain.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -12,13 +13,15 @@ import javax.persistence.*;
 @Entity
 public class Refresh {
     @Id
-    @Column(name = "refresh_id")
+    @Column(name = "refreshId")
     private Long id;
 
-    @OneToOne(mappedBy = "refresh")
+    @OneToOne
+    @JoinColumn(name = "githubId") //글을쓴 Member_id
+    @JsonIgnore
     private Member member;
 
-    @Column(name = "refresh_token")
+    @Column(name = "refreshToken")
     private String refreshToken;
 
     @Column(name="ip")

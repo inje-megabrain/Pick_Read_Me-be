@@ -17,7 +17,7 @@ import java.util.List;
 @Entity
 public class Post {
     @Id
-    @Column(name = "post_id")
+    @Column(name = "postId")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
@@ -27,16 +27,16 @@ public class Post {
     @Column(name = "content")
     private String content;
 
-    @Column(name = "post_created_at")
+    @Column(name = "postCreatedAt")
     private Date postCreatedAt;
 
-    @Column(name = "post_update_at")
+    @Column(name = "postUpdateAt")
     private Date postUpdatedAt;
 
     @Column(name = "repo")
     private String repo;
 
-    @Column(name = "post_like")
+    @Column(name = "postLike")
     private Long post_like;
 
     @ManyToMany(mappedBy = "likedPosts")
@@ -45,7 +45,7 @@ public class Post {
 
 
     @ManyToOne()
-    @JoinColumn(name = "member_id") //글을쓴 Member_id
+    @JoinColumn(name = "githubId") //글을쓴 Member_id
     private Member member;
 
     public void addLike(Member member) {

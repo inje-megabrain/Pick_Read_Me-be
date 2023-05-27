@@ -72,16 +72,23 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             Refresh refresh = new Refresh();
 
             Member member = new Member();
+            member.setId((Long) oAuth2User.getAttributes().get("id"));
+            member.setName(String.valueOf(oAuth2User.getAttributes().get("name")));
+            member.setEmail(String.valueOf(oAuth2User.getAttributes().get("email")));
+            member.setRepo(String.valueOf(oAuth2User.getAttributes().get("repo")));
+            member.setProfile(String.valueOf(oAuth2User.getAttributes().get("profile")));
             member.setUpdated(new Date());
+            member.setRoles(Collections.singletonList("USER"));
 
             refresh.setMember(member);
             refresh.setRefreshToken(token.getRefreshToken());
             refresh.setIp(request.getRemoteAddr());
-            refresh.setId(userDto.getId());
+            refresh.setId(member.getId());
             member.setRefresh(refresh);
 
-            refreshRepository.save(refresh);
             memberRepository.save(member);
+            refreshRepository.save(refresh);
+
 
 
             log.info("{}", token);
@@ -112,6 +119,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 member.setId((Long) oAuth2User.getAttributes().get("id"));
                 member.setName(String.valueOf(oAuth2User.getAttributes().get("name")));
                 member.setEmail(String.valueOf(oAuth2User.getAttributes().get("email")));
+                member.setRepo(String.valueOf(oAuth2User.getAttributes().get("repo")));
+                member.setProfile(String.valueOf(oAuth2User.getAttributes().get("profile")));
                 member.setCreated(new Date());
                 member.setUpdated(new Date());
                 member.setRoles(Collections.singletonList("USER"));
@@ -123,8 +132,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 refresh.setId(member.getId());
                 member.setRefresh(refresh);
 
-                refreshRepository.save(refresh);
                 memberRepository.save(member);
+                refreshRepository.save(refresh);
+
 
 
                 log.info("{}", token);

@@ -45,8 +45,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
 	//Database
-	implementation 'mysql:mysql-connector-java:8.0.32'
-	runtimeOnly 'mysql:mysql-connector-java:8.0.32'
+	implementation 'mysql:mysql-connector-java:8.0.33'
+	runtimeOnly 'mysql:mysql-connector-java:8.0.33'
 	implementation 'com.h2database:h2'
 	runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc'
 	runtimeOnly 'com.h2database:h2'

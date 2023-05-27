@@ -24,14 +24,19 @@ import java.util.stream.Collectors;
 public class Member implements UserDetails {
 
     @Id
-    @Column(name = "github_id", nullable = false)
+    @Column(name = "githubId", nullable = false)
     private Long id;
 
     @Column(name = "name", length = 200)
     private String name;
 
-    @OneToOne
-    @JoinColumn(name = "id")
+    @Column(name = "repo")
+    private String repo;
+
+    @Column
+    private String profile;
+
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL,fetch = FetchType.EAGER,  orphanRemoval=true)
     @JsonIgnore
     private Refresh refresh;
 
@@ -59,8 +64,8 @@ public class Member implements UserDetails {
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "post_like",
-            joinColumns = @JoinColumn(name = "github_id"),
-            inverseJoinColumns = @JoinColumn(name = "post_id")
+            joinColumns = @JoinColumn(name = "githubId"),
+            inverseJoinColumns = @JoinColumn(name = "postId")
     )
     private List<Post> likedPosts = new ArrayList<>();
 
