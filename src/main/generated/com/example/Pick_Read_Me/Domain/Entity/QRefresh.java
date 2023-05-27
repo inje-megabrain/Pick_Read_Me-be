@@ -1,4 +1,4 @@
-package com.example.Pick_Read_Me.Domain;
+package com.example.Pick_Read_Me.Domain.Entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -16,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QRefresh extends EntityPathBase<Refresh> {
 
-    private static final long serialVersionUID = -1847779925L;
+    private static final long serialVersionUID = -271239456L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 

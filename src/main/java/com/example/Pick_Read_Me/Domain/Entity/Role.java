@@ -1,4 +1,4 @@
-package com.example.Pick_Read_Me.Domain;
+package com.example.Pick_Read_Me.Domain.Entity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

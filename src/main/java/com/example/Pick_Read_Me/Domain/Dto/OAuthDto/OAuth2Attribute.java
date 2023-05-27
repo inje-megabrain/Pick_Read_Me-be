@@ -1,4 +1,4 @@
-package com.example.Pick_Read_Me.Domain.Dto;
+package com.example.Pick_Read_Me.Domain.Dto.OAuthDto;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -16,10 +16,12 @@ public class OAuth2Attribute {
     private String attributeKey;
     private String email;
     private String name;
+    private String repo;
 
+    private String profile;
     private Long id;
 
-    public static OAuth2Attribute of(String provider, String attributeKey,
+    public static OAuth2Attribute of(String provider, String attributeKey,  //
                                      Map<String, Object> attributes) {
         switch (provider) {
             case "github":
@@ -36,8 +38,10 @@ public class OAuth2Attribute {
         Integer id = (Integer) attributes.get("id");
         return OAuth2Attribute.builder()
                 .id(Long.valueOf(id))
-                .name((String) attributes.get("Name"))
+                .name((String) attributes.get("login"))
                 .email((String) attributes.get("email"))
+                .repo((String) attributes.get("html_url"))
+                .profile((String) attributes.get("avatar_url"))
                 .attributes(attributes)
                 .attributeKey(attributeKey)
                 .build();
@@ -50,6 +54,8 @@ public class OAuth2Attribute {
         map.put("name", name);
         map.put("email", email);
         map.put("id", id);
+        map.put("repo", repo);
+        map.put("profile", profile);
 
         return map;
     }

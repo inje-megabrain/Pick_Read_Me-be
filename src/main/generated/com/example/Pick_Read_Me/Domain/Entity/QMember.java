@@ -1,4 +1,4 @@
-package com.example.Pick_Read_Me.Domain;
+package com.example.Pick_Read_Me.Domain.Entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -16,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QMember extends EntityPathBase<Member> {
 
-    private static final long serialVersionUID = 213083594L;
+    private static final long serialVersionUID = -982986251L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
@@ -28,11 +28,19 @@ public class QMember extends EntityPathBase<Member> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final ListPath<Post, QPost> likedPosts = this.<Post, QPost>createList("likedPosts", Post.class, QPost.class, PathInits.DIRECT2);
+
     public final StringPath name = createString("name");
 
     public final StringPath password = createString("password");
 
+    public final ListPath<Post, QPost> posts = this.<Post, QPost>createList("posts", Post.class, QPost.class, PathInits.DIRECT2);
+
+    public final StringPath profile = createString("profile");
+
     public final QRefresh refresh;
+
+    public final StringPath repo = createString("repo");
 
     public final ListPath<String, StringPath> roles = this.<String, StringPath>createList("roles", String.class, StringPath.class, PathInits.DIRECT2);
 

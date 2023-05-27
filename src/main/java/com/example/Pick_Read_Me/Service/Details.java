@@ -1,6 +1,6 @@
 package com.example.Pick_Read_Me.Service;
 
-import com.example.Pick_Read_Me.Domain.Member;
+import com.example.Pick_Read_Me.Domain.Entity.Member;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;

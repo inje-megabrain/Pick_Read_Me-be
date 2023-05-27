@@ -1,6 +1,6 @@
 package com.example.Pick_Read_Me.Repository;
 
-import com.example.Pick_Read_Me.Domain.Member;
+import com.example.Pick_Read_Me.Domain.Entity.Member;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;

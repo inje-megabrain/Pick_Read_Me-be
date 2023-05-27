@@ -1,13 +1,11 @@
 package com.example.Pick_Read_Me.Jwt;
 
 
-import com.example.Pick_Read_Me.Domain.Refresh;
+import com.example.Pick_Read_Me.Domain.Entity.Refresh;
 import com.example.Pick_Read_Me.Repository.RefreshRepository;
 import com.example.Pick_Read_Me.Util.CookieUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,13 +30,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
 
+
         String accessToken = null;
         String refreshToken = null;
         Authentication authenticate;
         //사용자의 principal과 credential 정보를 Authentication에 담는다
-        log.info("Jwt");
         accessToken =  req.getHeader("accessToken");
-        log.info(accessToken);
+        refreshToken = req.getHeader("refreshToken");
+        if(accessToken==null && refreshToken==null) {
+            filterChain.doFilter(req, res);
+            return;
+        }
         if(accessToken==null || jwtProvider.isTokenExpired(accessToken)) {
             refreshToken = req.getHeader("refreshToken");
             log.info("리프레시::"+refreshToken);
@@ -72,7 +74,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     throw new RuntimeException("등록한 IP가 다릅니다 다시 로그인해주세요!");
                 }
             } else {
-                throw new RuntimeException("다시로그인 하세요");
+                throw new RuntimeException("다시로그인 하세요 토큰이 없어요!");
             }
         }
         else if(accessToken!=null && !jwtProvider.isTokenExpired(accessToken)){

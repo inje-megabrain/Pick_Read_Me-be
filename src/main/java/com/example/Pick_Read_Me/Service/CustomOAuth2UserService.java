@@ -1,7 +1,7 @@
 package com.example.Pick_Read_Me.Service;
 
 
-import com.example.Pick_Read_Me.Domain.Dto.OAuth2Attribute;
+import com.example.Pick_Read_Me.Domain.Dto.OAuthDto.OAuth2Attribute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
