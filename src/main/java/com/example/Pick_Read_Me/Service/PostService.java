@@ -219,7 +219,7 @@ public class PostService {
     }
 
     /*
-    
+
      */
     private Slice<Post> checkLastPage(Pageable pageable, List<Post> results) {
 
