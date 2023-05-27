@@ -146,7 +146,9 @@ public class OauthService {
         send.put("refreshToken", refreshToken);
         return send;
     }
+/*
 
+ */
     private boolean checkMember(Optional<Member> id) {
         if(id.isPresent())
             return false;
