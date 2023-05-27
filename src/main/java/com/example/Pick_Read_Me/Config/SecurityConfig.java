@@ -25,7 +25,8 @@ public class SecurityConfig {
     private final CustomOAuth2UserService oAuth2UserService;
     private final OAuth2SuccessHandler successHandler;
     private final JwtProvider tokenService;
-
+    @Autowired
+    private CorsFilter corsFilter;
     private String[] permitList={
             "/v2/**",
             "/v3/**",
@@ -65,7 +66,7 @@ public class SecurityConfig {
     protected SecurityFilterChain config(HttpSecurity http, JwtProvider jwtProvider,
                                          CookieUtil cookieUtil) throws Exception {
         http
-                .cors().and()
+                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
