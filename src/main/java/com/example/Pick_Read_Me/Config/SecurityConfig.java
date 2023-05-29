@@ -38,11 +38,12 @@ public class SecurityConfig {
             "/webjars/**",
             "/swagger-resources/**",
             "/home/**",
-            "/auth/**",
             "/test",
+            "/api/**",
             "/login",
             "/home?accessToken=*",
             "/home\\?accessToken=.*",
+            "/api/**",
             "/test/**",
     };
     @Autowired
