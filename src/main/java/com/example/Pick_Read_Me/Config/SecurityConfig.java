@@ -17,12 +17,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.logging.Filter;
 
 @Configuration
 @RequiredArgsConstructor
@@ -30,6 +32,8 @@ public class SecurityConfig {
     private final CustomOAuth2UserService oAuth2UserService;
     private final OAuth2SuccessHandler successHandler;
     private final JwtProvider tokenService;
+
+    private final CorsFilter corsFilter;
     private String[] permitList={
             "/v2/**",
             "/v3/**",
@@ -65,16 +69,19 @@ public class SecurityConfig {
         //return (web -> web.ignoring().antMatchers("/test"));
     }
 
-    protected SecurityFilterChain config(HttpSecurity http, JwtProvider jwtProvider, CookieUtil cookieUtil) throws Exception {
+
+    @Bean
+    protected SecurityFilterChain config(HttpSecurity http, JwtProvider jwtProvider,
+                                         CookieUtil cookieUtil) throws Exception {
         http
-                .cors().configurationSource(corsConfigurationSource())
-                .and()
-                .authorizeRequests(
-                        auth -> auth.anyRequest().authenticated()
-                )
+                .addFilterBefore(corsFilter, ChannelProcessingFilter.class)
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                .authorizeRequests()
+                .anyRequest().authenticated()
+                .and()
+
                 .addFilterBefore(jwtAuthenticationFilter(jwtProvider, cookieUtil, refreshRepository),
                         UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login()
@@ -89,21 +96,7 @@ public class SecurityConfig {
                 .userService(customOAuth2UserService);
 
         return http.build();
-    }
 
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowCredentials(true);
-        config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://52.78.80.150:9000"));
-        config.setAllowedMethods(Arrays.asList("HEAD","POST","GET","DELETE","PUT"));
-        config.setAllowedHeaders(Arrays.asList("*"));
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
     }
 
 
