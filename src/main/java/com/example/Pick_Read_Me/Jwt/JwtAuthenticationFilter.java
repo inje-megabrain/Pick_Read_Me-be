@@ -42,6 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.info(headerName + ": " + headerValue);
         }
         //사용자의 principal과 credential 정보를 Authentication에 담는다
+
         accessToken =  req.getHeader("accessToken");
         refreshToken = req.getHeader("refreshToken");
         if(accessToken==null && refreshToken==null) {

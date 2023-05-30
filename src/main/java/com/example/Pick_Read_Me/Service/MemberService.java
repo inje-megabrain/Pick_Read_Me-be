@@ -5,6 +5,7 @@ import com.example.Pick_Read_Me.Domain.Entity.Member;
 import com.example.Pick_Read_Me.Exception.MemberNotFoundException;
 import com.example.Pick_Read_Me.Jwt.JwtProvider;
 import com.example.Pick_Read_Me.Repository.MemberRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 
 @Service
+@Slf4j
 public class MemberService {
     @Autowired
     private JwtProvider jwtProvider;
@@ -19,6 +21,7 @@ public class MemberService {
     @Autowired
     private MemberRepository memberRepository;
     public ResponseEntity<GetMemberDto> getMembers(HttpServletRequest request) {
+        log.info(request.getHeader("accessToken"));
         String token = request.getHeader("accessToken");
         String github_id = jwtProvider.getGithubIdFromToken(token);
 
