@@ -72,7 +72,7 @@ public class MemberController {
         return memberService.getMembers(request);
     }
 
-    @GetMapping("/header")
+    @GetMapping("/api/header")
     public String hea(@RequestHeader MultiValueMap<String, String> h) {
         log.info(h);
         return h.toString();
