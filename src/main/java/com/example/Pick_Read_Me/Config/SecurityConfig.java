@@ -70,6 +70,7 @@ public class SecurityConfig {
     protected SecurityFilterChain config(HttpSecurity http, JwtProvider jwtProvider,
                                          CookieUtil cookieUtil) throws Exception {
         http
+                .cors().and()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
