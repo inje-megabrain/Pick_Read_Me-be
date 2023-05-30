@@ -96,7 +96,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // 허용할 Origin을 설정합니다.
+        configuration.setAllowedOrigins(Arrays.asList("*")); // 허용할 Origin을 설정합니다.
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE")); // 허용할 HTTP 메소드 설정
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // 허용할 Header 설정
         configuration.setAllowCredentials(true); // Credentials(즉, 인증정보) 허용 설정

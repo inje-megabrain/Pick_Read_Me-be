@@ -5,12 +5,14 @@ import com.example.Pick_Read_Me.Domain.Dto.PostDto.PostsDTO;
 import com.example.Pick_Read_Me.Domain.Entity.Post;
 import com.example.Pick_Read_Me.Jwt.JwtProvider;
 import com.example.Pick_Read_Me.Service.PostService;
+import com.example.Pick_Read_Me.Util.CommonUtil;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +24,8 @@ import java.util.List;
 public class PostController {
 
     @Autowired
+    private CommonUtil commonUtil;
+    @Autowired
     private JwtProvider jwtProvider;
 
     @Autowired
@@ -30,11 +34,14 @@ public class PostController {
     @Operation(summary = "원하는 Repo의 ReadMe파일을 가져올 수 있는 API",
             description = "Token, 원하는 Repo이름: name 파라미터 필요\n"+"반환값은 makrdown입니다.")
     @GetMapping("/get/readmes")
-    public String getReadme(HttpServletRequest request, @RequestParam("name") String name) {
+    public String getReadme(HttpServletRequest request,
+                            @RequestParam("name") String name, Model model) {
         String token = request.getHeader("accessToken");
         Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(token));
 
-        return postService.getReadMe(request, name);
+        String MarkDown= postService.getReadMe(request, name);
+        String html = commonUtil.markdown(MarkDown);
+        return html;
     }
 
     @PostMapping("/posts")

@@ -44,8 +44,6 @@ public class GitHubOAuthController {
     @GetMapping(value = "code")
     public String getToken(@RequestParam("code") String code) throws Exception {
 
-
-
         return "!";
     }
 }
