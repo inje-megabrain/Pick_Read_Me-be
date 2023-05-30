@@ -12,10 +12,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.core.parameters.P;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
@@ -72,5 +70,11 @@ public class MemberController {
     @GetMapping("/api/get/members")
     public ResponseEntity<GetMemberDto> getMembers(HttpServletRequest request) {
         return memberService.getMembers(request);
+    }
+
+    @GetMapping("/header")
+    public String hea(@RequestHeader MultiValueMap<String, String> h) {
+        log.info(h);
+        return h.toString();
     }
 }
