@@ -97,7 +97,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addExposedHeader("Access-Control-Allow-Origin"); // 'Access-Control-Allow-Origin' 헤더 노출
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000/**")); // 특정 도메인을 허용
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://52.78.80.150:9000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE")); // 허용할 HTTP 메소드 설정
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // 허용할 Header 설정
         configuration.setAllowCredentials(true); // Credentials(즉, 인증정보) 허용 설정
