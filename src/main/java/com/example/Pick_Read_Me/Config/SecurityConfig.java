@@ -75,7 +75,7 @@ public class SecurityConfig {
                                          CookieUtil cookieUtil) throws Exception {
         http
                // .addFilterBefore(corsFilter, ChannelProcessingFilter.class)
-                .cors().disable()
+
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()

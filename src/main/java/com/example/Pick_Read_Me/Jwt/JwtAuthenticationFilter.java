@@ -15,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.HashMap;
 
 @RequiredArgsConstructor
@@ -34,6 +35,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken = null;
         String refreshToken = null;
         Authentication authenticate;
+        Enumeration<String> headerNames = req.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            String headerValue = req.getHeader(headerName);
+            log.info(headerName + ": " + headerValue);
+        }
         //사용자의 principal과 credential 정보를 Authentication에 담는다
         accessToken =  req.getHeader("accessToken");
         refreshToken = req.getHeader("refreshToken");
