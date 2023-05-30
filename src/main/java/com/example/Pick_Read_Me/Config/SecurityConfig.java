@@ -70,7 +70,11 @@ public class SecurityConfig {
     protected SecurityFilterChain config(HttpSecurity http, JwtProvider jwtProvider,
                                          CookieUtil cookieUtil) throws Exception {
         http
-                .cors().and()
+                .cors().configurationSource(corsConfigurationSource())
+                .and()
+                .authorizeRequests(
+                        auth -> auth.anyRequest().authenticated()
+                )
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -94,5 +98,18 @@ public class SecurityConfig {
 
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowCredentials(true);
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        config.setAllowedMethods(Arrays.asList("HEAD","POST","GET","DELETE","PUT"));
+        config.setAllowedHeaders(Arrays.asList("*"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
 
 }
