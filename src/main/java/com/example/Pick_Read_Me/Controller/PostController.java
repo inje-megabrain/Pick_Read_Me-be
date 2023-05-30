@@ -8,6 +8,7 @@ import com.example.Pick_Read_Me.Service.PostService;
 import com.example.Pick_Read_Me.Util.CommonUtil;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -21,6 +22,7 @@ import java.util.List;
 @RestController
 @Api(tags="글 관련 API")
 @RequestMapping("/api")
+@Slf4j
 public class PostController {
 
     @Autowired
@@ -106,6 +108,7 @@ public class PostController {
     @GetMapping("/get/rand/posts")
     public Slice<Post> getPosts(HttpServletRequest request,
                                 @RequestParam int page) {
+        log.info("!@#!@#!@##@!@#!@#@!");
         return postService.searchByPost(request,  PageRequest.ofSize(page));
     }
 

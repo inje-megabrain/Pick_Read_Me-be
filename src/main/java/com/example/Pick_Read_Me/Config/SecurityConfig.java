@@ -65,18 +65,15 @@ public class SecurityConfig {
         //return (web -> web.ignoring().antMatchers("/test"));
     }
 
-
-    @Bean
-    protected SecurityFilterChain config(HttpSecurity http, JwtProvider jwtProvider,
-                                         CookieUtil cookieUtil) throws Exception {
+    protected SecurityFilterChain config(HttpSecurity http, JwtProvider jwtProvider, CookieUtil cookieUtil) throws Exception {
         http
                 .cors().configurationSource(corsConfigurationSource())
                 .and()
+                .authorizeRequests(
+                        auth -> auth.anyRequest().authenticated()
+                )
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter(jwtProvider, cookieUtil, refreshRepository),
                         UsernamePasswordAuthenticationFilter.class)
@@ -92,15 +89,15 @@ public class SecurityConfig {
                 .userService(customOAuth2UserService);
 
         return http.build();
-
     }
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://52.78.80.150:9000"));
         config.setAllowedMethods(Arrays.asList("HEAD","POST","GET","DELETE","PUT"));
         config.setAllowedHeaders(Arrays.asList("*"));
 
@@ -108,5 +105,6 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
+
 
 }
