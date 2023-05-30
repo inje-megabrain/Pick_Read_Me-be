@@ -70,7 +70,6 @@ public class SecurityConfig {
     protected SecurityFilterChain config(HttpSecurity http, JwtProvider jwtProvider,
                                          CookieUtil cookieUtil) throws Exception {
         http
-                .cors().and()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -93,20 +92,6 @@ public class SecurityConfig {
         return http.build();
 
     }
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addExposedHeader("Access-Control-Allow-Origin"); // 'Access-Control-Allow-Origin' 헤더 노출
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://52.78.80.150:9000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE")); // 허용할 HTTP 메소드 설정
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // 허용할 Header 설정
-        configuration.setAllowCredentials(true); // Credentials(즉, 인증정보) 허용 설정
-        configuration.setMaxAge(3600L); // Pre-flight 요청의 유효시간 설정
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 Cors 설정 적용
-
-        return source;
-    }
 
 }

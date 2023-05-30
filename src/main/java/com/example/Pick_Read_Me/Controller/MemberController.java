@@ -69,7 +69,7 @@ public class MemberController {
     }
 
     @Operation(summary = "해당 유저 조회", description = "헤더를 주면 헤더를 까서 DB에서 조회합니다")
-    @GetMapping("/get/members")
+    @GetMapping("/api/get/members")
     public ResponseEntity<GetMemberDto> getMembers(HttpServletRequest request) {
         return memberService.getMembers(request);
     }
