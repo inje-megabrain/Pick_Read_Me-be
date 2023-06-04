@@ -43,11 +43,9 @@ public class SecurityConfig {
             "/swagger-resources/**",
             "/home/**",
             "/test",
-            "/api/**",
             "/login",
             "/home?accessToken=*",
             "/home\\?accessToken=.*",
-            "/api/**",
             "/test/**",
     };
     @Autowired

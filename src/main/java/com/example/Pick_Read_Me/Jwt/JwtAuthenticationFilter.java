@@ -32,20 +32,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
 
 
+        log.info("JWT FIlter");
         String accessToken = null;
         String refreshToken = null;
         Authentication authenticate;
-        Enumeration<String> headerNames = req.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            String headerName = headerNames.nextElement();
-            String headerValue = req.getHeader(headerName);
-            log.info(headerName + ": " + headerValue);
-        }
-        //사용자의 principal과 credential 정보를 Authentication에 담는다
 
+        //사용자의 principal과 credential 정보를 Authentication에 담는다
         accessToken =  req.getHeader("accessToken");
         refreshToken = req.getHeader("refreshToken");
-        log.info("JWT FIlter");
         if(accessToken==null && refreshToken==null) {
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             res.setContentType("application/json");
