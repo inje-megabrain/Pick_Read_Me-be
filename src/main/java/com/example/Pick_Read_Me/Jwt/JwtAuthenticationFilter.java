@@ -45,6 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         accessToken =  req.getHeader("accessToken");
         refreshToken = req.getHeader("refreshToken");
+        log.info("JWT FIlter");
         if(accessToken==null && refreshToken==null) {
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             res.setContentType("application/json");
