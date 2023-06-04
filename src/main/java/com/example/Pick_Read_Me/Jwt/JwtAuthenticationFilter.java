@@ -50,7 +50,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if(accessToken==null || jwtProvider.isTokenExpired(accessToken)) {
             refreshToken = req.getHeader("refreshToken");
             log.info("리프레시::"+refreshToken);
-            if (refreshToken != null || !jwtProvider.RefreshisTokenExpired(refreshToken)) {
+            if (refreshToken != null && !jwtProvider.RefreshisTokenExpired(refreshToken)) {
+
                 Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(refreshToken));
                 log.info(String.valueOf(github_id));
 
@@ -75,21 +76,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     refresh.setRefreshToken(refreshToken);
                     refresh.setId(refresh.getId());
                     refreshRepository.save(refresh);
+                    res.setStatus(HttpServletResponse.SC_OK);
+                    res.setContentType("application/json");
+                    res.getWriter().write("{\"error\": \"리프레시 토큰 통과\"}");
 
                 } else {
                     res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     res.setContentType("application/json");
+                    res.getWriter().write("{\"error\": \"리프레시 토큰 IP 다름\"}");
+                    filterChain.doFilter(req, res);
                     return ;
                 }
             } else if(refreshToken==null){
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 res.setContentType("application/json");
                 res.getWriter().write("{\"error\": \"리프레시 토큰이 없어요\"}");
+                filterChain.doFilter(req, res);
                 return ;
             } else if(jwtProvider.RefreshisTokenExpired(refreshToken)){
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 res.setContentType("application/json");
                 res.getWriter().write("{\"error\": \"리프레시 토큰 만료\"}");
+                filterChain.doFilter(req, res);
                 return ;
             }
         }
@@ -107,11 +115,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             res.setContentType("application/json");
             res.getWriter().write("{\"error\": \"액세스 토큰 없음\"}");
+            filterChain.doFilter(req, res);
             return ;
         }else if(jwtProvider.isTokenExpired(accessToken)){
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             res.setContentType("application/json");
             res.getWriter().write("{\"error\": \"액세스 토큰 만료\"}");
+            filterChain.doFilter(req, res);
             return ;
         }
         filterChain.doFilter(req, res);
