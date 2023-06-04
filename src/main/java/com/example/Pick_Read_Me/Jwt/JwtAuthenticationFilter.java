@@ -43,8 +43,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if(accessToken==null && refreshToken==null) {
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             res.setContentType("application/json");
+            res.setCharacterEncoding("UTF-8");
             res.getWriter().write("{\"error\": \"토큰이 둘다 없습니다\"}");
-            filterChain.doFilter(req, res);
+
             return;
         }
         if(accessToken==null || jwtProvider.isTokenExpired(accessToken)) {
@@ -64,7 +65,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         authenticate = jwtProvider.authenticate(new UsernamePasswordAuthenticationToken(github_id, ""));
                         SecurityContextHolder.getContext().setAuthentication(authenticate);
                     }catch(Exception e){
+
                         throw new RuntimeException("authenticate 오류!");
+
                     }
 
                     HashMap<String, String> m = new HashMap<>();
@@ -78,26 +81,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     refreshRepository.save(refresh);
                     res.setStatus(HttpServletResponse.SC_OK);
                     res.setContentType("application/json");
+                    res.setCharacterEncoding("UTF-8");
                     res.getWriter().write("{\"error\": \"리프레시 토큰 통과\"}");
 
                 } else {
+                    log.info("리프래시 토큰 IP 다름");
                     res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     res.setContentType("application/json");
+                    res.setCharacterEncoding("UTF-8");
                     res.getWriter().write("{\"error\": \"리프레시 토큰 IP 다름\"}");
-                    filterChain.doFilter(req, res);
                     return ;
+
                 }
             } else if(refreshToken==null){
+                log.info("리프래시 없음");
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 res.setContentType("application/json");
+                res.setCharacterEncoding("UTF-8");
                 res.getWriter().write("{\"error\": \"리프레시 토큰이 없어요\"}");
-                filterChain.doFilter(req, res);
                 return ;
+
             } else if(jwtProvider.RefreshisTokenExpired(refreshToken)){
+                log.info("리프래시 유효기간 지남");
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 res.setContentType("application/json");
+                res.setCharacterEncoding("UTF-8");
                 res.getWriter().write("{\"error\": \"리프레시 토큰 만료\"}");
-                filterChain.doFilter(req, res);
+
+
                 return ;
             }
         }
@@ -114,15 +125,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }else if(accessToken==null) {
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             res.setContentType("application/json");
+            res.setCharacterEncoding("UTF-8");
             res.getWriter().write("{\"error\": \"액세스 토큰 없음\"}");
-            filterChain.doFilter(req, res);
             return ;
+
         }else if(jwtProvider.isTokenExpired(accessToken)){
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             res.setContentType("application/json");
+            res.setCharacterEncoding("UTF-8");
             res.getWriter().write("{\"error\": \"액세스 토큰 만료\"}");
-            filterChain.doFilter(req, res);
             return ;
+
         }
         filterChain.doFilter(req, res);
 
