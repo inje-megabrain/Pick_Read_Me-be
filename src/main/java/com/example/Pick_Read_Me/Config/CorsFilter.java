@@ -27,6 +27,7 @@ public class CorsFilter implements Filter {
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
         } else {
+            response.setHeader("Access-Control-Allow-Origin", "https://github.com");
             chain.doFilter(req, res);
         }
     }
