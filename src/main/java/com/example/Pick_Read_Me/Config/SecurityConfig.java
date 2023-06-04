@@ -22,6 +22,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
 
 import java.util.Arrays;
 import java.util.logging.Filter;
@@ -32,8 +34,6 @@ public class SecurityConfig {
     private final CustomOAuth2UserService oAuth2UserService;
     private final OAuth2SuccessHandler successHandler;
     private final JwtProvider tokenService;
-
-    private final CorsFilter corsFilter;
     private String[] permitList={
             "/v2/**",
             "/v3/**",
@@ -67,12 +67,27 @@ public class SecurityConfig {
         //return (web -> web.ignoring().antMatchers("/test"));
     }
 
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://s3-ap-northeast-2.amazonaws.com", "https://github.com"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Origin, X-Requested-With, Content-Type, Accept, Key, Authorization, access-control-allow-origin, Authorizationsecret, accessToken, refreshToken"));
+        configuration.setAllowCredentials(true);
+
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return new CorsFilter(source);
+    }
+
 
     @Bean
     protected SecurityFilterChain config(HttpSecurity http, JwtProvider jwtProvider,
                                          CookieUtil cookieUtil) throws Exception {
         http
-                .addFilterBefore(corsFilter, ChannelProcessingFilter.class)
+                .addFilterBefore(corsFilter(), ChannelProcessingFilter.class)
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()

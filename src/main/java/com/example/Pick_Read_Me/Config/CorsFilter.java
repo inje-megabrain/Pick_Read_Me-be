@@ -1,3 +1,5 @@
+
+/*
 package com.example.Pick_Read_Me.Config;
 
 import org.springframework.core.Ordered;
@@ -18,7 +20,7 @@ public class CorsFilter implements Filter {
             throws IOException, ServletException {
         HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest request = (HttpServletRequest) req;
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000, https://s3-ap-northeast-2.amazonaws.com");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
         response.setHeader("Access-Control-Max-Age", "3600");
@@ -27,10 +29,12 @@ public class CorsFilter implements Filter {
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
         } else {
-            response.setHeader("Access-Control-Allow-Origin", "https://github.com");
             chain.doFilter(req, res);
         }
     }
 
     // 다른 메서드들 (init(), destroy())을 구현할 수도 있습니다.
 }
+*/
+
+
