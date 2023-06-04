@@ -1,37 +1,79 @@
 package com.example.Pick_Read_Me.Service;
 
+
 import io.jsonwebtoken.io.IOException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-
+import java.net.MalformedURLException;
+import java.net.URL;
 @Service
+@Slf4j
 public class HtmlService {
+
     public BufferedImage HtmlToImage(String htmlContent) {
         try {
-            // HTML을 BufferedImage로 변환
-            BufferedImage image = new BufferedImage(800, 600, BufferedImage.TYPE_INT_RGB);
-            Graphics2D graphics = image.createGraphics();
-            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            // Parse the HTML content using Jsoup
+            Document doc = Jsoup.parse(htmlContent);
 
-            // HTML을 그래픽 컨텍스트에 그립니다.
-            // 실제로는 Flying Saucer, Thymeleaf, Jsoup 등의 라이브러리를 사용하여 HTML을 렌더링하는 로직을 추가해야 합니다.
+            // Create a BufferedImage object with the desired width and height
+            int width = 800;
+            int height = 600;
+            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+            // Get the graphics context of the image
+            Graphics2D graphics = image.createGraphics();
+
+            // Set the background color
             graphics.setColor(Color.WHITE);
-            graphics.fillRect(0, 0, 800, 600);
-            graphics.setColor(Color.BLACK);
-            graphics.drawString(htmlContent, 20, 40);
+            graphics.fillRect(0, 0, width, height);
+
+            // Render the HTML content onto the image
+            Element body = doc.body();
+            renderElement(body, graphics);
 
             return image;
         } catch (Exception e) {
-            // 변환 중 에러 처리
             e.printStackTrace();
+            // Handle the exception or return null
             return null;
         }
     }
+
+    private void renderElement(Element element, Graphics2D graphics) throws IOException, java.io.IOException {
+        String tagName = element.tagName();
+
+        if ("img".equalsIgnoreCase(tagName)) {
+            // If the element is an <img> tag, load the image and draw it on the graphics context
+            String src = element.attr("src");
+            BufferedImage img = loadImage(src);
+            if (img != null) {
+                int x = Integer.parseInt(element.attr("x"));
+                int y = Integer.parseInt(element.attr("y"));
+                graphics.drawImage(img, x, y, null);
+            }
+        } else {
+            // If the element is not an <img> tag, recursively render its children
+            for (Element child : element.children()) {
+                renderElement(child, graphics);
+            }
+        }
+    }
+
+    private BufferedImage loadImage(String src) throws IOException, java.io.IOException {
+        // Load the image from the specified URL
+        URL url = new URL(src);
+        return ImageIO.read(url);
+    }
+
+
 
     public BufferedImage createThumbnail(BufferedImage image, int width, int height) {
         // 썸네일 생성 로직 구현

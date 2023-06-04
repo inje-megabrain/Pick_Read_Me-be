@@ -21,8 +21,8 @@ public class MemberService {
     @Autowired
     private MemberRepository memberRepository;
     public ResponseEntity<GetMemberDto> getMembers(HttpServletRequest request) {
-        log.info("a\n"+request.getHeader("accessToken"));
-        log.info("r\n"+request.getHeader("refreshToken"));
+        log.info("a"+request.getHeader("accessToken"));
+        log.info("r"+request.getHeader("refreshToken"));
         String token = request.getHeader("accessToken");
         String github_id = jwtProvider.getGithubIdFromToken(token);
 

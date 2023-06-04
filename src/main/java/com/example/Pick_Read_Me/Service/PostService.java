@@ -73,12 +73,14 @@ public class PostService {
         ResponseEntity<Map> response = restTemplate.exchange(apiUrl, HttpMethod.GET, entity, Map.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
+
             Map<String, Object> responseData = response.getBody();
             String content = (String) responseData.get("content");
             content = content.replace("\n", "");
             // Base64로 인코딩된 내용을 디코딩
             byte[] decodedBytes = Base64.getDecoder().decode(content);
             String decodedContent = new String(decodedBytes, StandardCharsets.UTF_8);
+            log.info(decodedContent);
 
             return decodedContent;
         } else {

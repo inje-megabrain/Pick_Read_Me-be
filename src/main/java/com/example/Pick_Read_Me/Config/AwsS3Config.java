@@ -8,6 +8,8 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
+import java.net.URI;
+
 @Configuration
 public class AwsS3Config {
 
@@ -23,8 +25,10 @@ public class AwsS3Config {
     @Bean
     public S3Client s3Client() {
         AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
+        String endpoint = "https://s3-" + region + ".amazonaws.com"; // 엔드포인트 문자열 생성
         return S3Client.builder()
                 .region(Region.of(region))
+                .endpointOverride(URI.create(endpoint)) // 버킷의 엔드포인트를 사용
                 .credentialsProvider(StaticCredentialsProvider.create(credentials))
                 .build();
     }

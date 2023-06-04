@@ -1,5 +1,6 @@
 package com.example.Pick_Read_Me.Service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import java.io.ByteArrayInputStream;
 
 @Service
+@Slf4j
 public class ThumbnailService {
 
     @Autowired
@@ -24,7 +26,7 @@ public class ThumbnailService {
     public void saveThumbnailToS3(byte[] thumbnailData, String fileName) {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(thumbnailData)) {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                    .bucket("bucket")
+                    .bucket(bucket)
                     .key(fileName)
                     .build();
 
@@ -32,7 +34,7 @@ public class ThumbnailService {
             putObjectRequest = putObjectRequest.toBuilder()
                     .contentLength((long) imageData.asByteArray().length)
                     .build();
-
+            log.info(String.valueOf(imageData));
             PutObjectResponse response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(thumbnailData));
 
             System.out.println("Thumbnail uploaded to S3. ETag: " + response.eTag());
