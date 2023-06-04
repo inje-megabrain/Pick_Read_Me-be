@@ -81,7 +81,6 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .anyRequest().authenticated()
                 .and()
-
                 .addFilterBefore(jwtAuthenticationFilter(jwtProvider, cookieUtil, refreshRepository),
                         UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login()

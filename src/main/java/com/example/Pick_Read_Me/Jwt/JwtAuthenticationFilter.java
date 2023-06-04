@@ -85,19 +85,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 } else {
                     res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     res.setContentType("application/json");
-                    res.getWriter().write("{\"error\": \"IP가 다름\"}");
-                    throw new RuntimeException("등록한 IP가 다릅니다 다시 로그인해주세요!");
+                    return ;
                 }
             } else if(refreshToken==null){
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 res.setContentType("application/json");
                 res.getWriter().write("{\"error\": \"리프레시 토큰이 없어요\"}");
-                throw new RuntimeException("리프레시 토큰이 없어요!");
+                return ;
             } else if(jwtProvider.RefreshisTokenExpired(refreshToken)){
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 res.setContentType("application/json");
                 res.getWriter().write("{\"error\": \"리프레시 토큰 만료\"}");
-                throw new RuntimeException("리프레시 토큰이 만료됐어요!");
+                return ;
             }
         }
         else if(accessToken!=null && !jwtProvider.isTokenExpired(accessToken)){
@@ -107,16 +106,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authenticate);
             }catch(Exception e)
             {
-                throw new RuntimeException("다시 로그인하세요");
+                return ;
+
             }
         }else if(accessToken==null) {
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             res.setContentType("application/json");
             res.getWriter().write("{\"error\": \"액세스 토큰 없음\"}");
+            return ;
         }else if(jwtProvider.isTokenExpired(accessToken)){
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             res.setContentType("application/json");
             res.getWriter().write("{\"error\": \"액세스 토큰 만료\"}");
+            return ;
         }
         filterChain.doFilter(req, res);
 
