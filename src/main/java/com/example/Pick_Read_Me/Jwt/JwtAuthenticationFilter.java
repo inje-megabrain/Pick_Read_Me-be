@@ -52,8 +52,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             refreshToken = req.getHeader("refreshToken");
             log.info("리프레시::"+refreshToken);
             if (refreshToken != null && !jwtProvider.RefreshisTokenExpired(refreshToken)) {
+                log.info("githubID검사");
 
-                Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(refreshToken));
+                Long github_id = Long.valueOf(jwtProvider.getRefreshGithubIdFromToken(refreshToken));
                 log.info(String.valueOf(github_id));
 
                 Refresh refresh =  refreshRepository.findById(github_id).orElseGet(Refresh::new);

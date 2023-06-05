@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 @Service
@@ -38,7 +39,10 @@ public class HtmlService {
             // Render the HTML content onto the image
             Element body = doc.body();
             renderElement(body, graphics);
+            String imagePath = "src/main/resources/image.jpg"; // 저장할 이미지 파일 경로
 
+            File output = new File(imagePath);
+            ImageIO.write(image, "jpg", output); // 이미지 파일로 저장
             return image;
         } catch (Exception e) {
             e.printStackTrace();

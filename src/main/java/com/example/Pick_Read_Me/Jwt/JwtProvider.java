@@ -28,7 +28,7 @@ public class JwtProvider implements AuthenticationProvider {
 
     private final MyUserDetailsService userDetailsService;
 
-    public static final long TOKEN_VALIDATION_SECOND = 60L;   //30분
+    public static final long TOKEN_VALIDATION_SECOND = 1800L;   //30분
     public static final long REFRESH_TOKEN_VALIDATION_TIME = 300L; //5분
 
 
@@ -51,7 +51,10 @@ public class JwtProvider implements AuthenticationProvider {
         DecodedJWT verifiedToken = validateToken(token);
         return verifiedToken.getClaim("githubId").asString();
     }
-
+    public String getRefreshGithubIdFromToken(String token) {
+        DecodedJWT verifiedToken = RefreshvalidateToken(token);
+        return verifiedToken.getClaim("githubId").asString();
+    }
     private JWTVerifier getTokenValidator() {
         return JWT.require(getSigningKey(SECRET_KEY))
                 .withIssuer(ISSUER)
