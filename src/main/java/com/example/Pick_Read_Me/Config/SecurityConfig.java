@@ -47,7 +47,6 @@ public class SecurityConfig {
             "/home?accessToken=*",
             "/home\\?accessToken=.*",
             "/test/**",
-
     };
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
@@ -64,7 +63,7 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {  //해당 URL은 필터 거치지 않겠다
-        return (web -> web.ignoring().antMatchers(permitList));
+        return (web -> web.ignoring().antMatchers(permitList)); //여기는 모든 필터를 거치지 않는 곳
         //return (web -> web.ignoring().antMatchers("/test"));
     }
 
@@ -93,6 +92,7 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests().antMatchers("/api/**").permitAll()
+                //여기는 권한 즉 user,admin 등등 모든 처리를 하겠다는 걸
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter(jwtProvider, cookieUtil, refreshRepository),
