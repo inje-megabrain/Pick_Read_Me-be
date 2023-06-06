@@ -42,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         refreshToken = req.getHeader("refreshToken");
 
         if(accessToken==null && refreshToken==null) {       //토큰이 둘다 없다면
-            response401(res, "error: 토큰이 둘다 없습니다");
+            response401(res, "error: 토큰이 둘다 만료");
             return;
         }
 
@@ -69,7 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     accessToken = jwtProvider.generateToken(m);
                     res.addHeader("accessToken", accessToken);  //accessToken 다시 넘겨주기
 
-                    response401(res, "accessToken 재발급");
+                    response200(res, "accessToken 재발급");
                     return ;
                 }
                 else {    //IP가 다른 경우 로그아웃 시켜야함
@@ -79,7 +79,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             else if(refreshToken==null){    //accessToken존재 하지만 refreshToken이 없음
                 log.info("리프래시 없음");
-                response401(res, "error : 리프래시 토큰이 없어요");
+                response401(res, "error : 리프래시 토큰이 없음");
                 return ;
             } else if(jwtProvider.RefreshisTokenExpired(refreshToken)){ //리프래시 토큰 만료
                 log.info("리프래시 토큰 만료");
@@ -102,6 +102,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public void response401(HttpServletResponse res, String print) throws IOException {
         res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+        res.getWriter().write(print);
+    }
+    public void response200(HttpServletResponse res, String print) throws IOException {
+        res.setStatus(HttpServletResponse.SC_OK);
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         res.getWriter().write(print);
