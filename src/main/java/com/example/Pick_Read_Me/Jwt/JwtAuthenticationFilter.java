@@ -69,7 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     m.put("githubId", String.valueOf(github_id));
 
                     accessToken = jwtProvider.generateToken(m);
-                    response200(res, "accessToken 재발급", accessToken);
+                    response200(res, accessToken);
                     return ;
                 }
                 else {    //IP가 다른 경우 로그아웃 시켜야함
@@ -106,11 +106,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         res.setCharacterEncoding("UTF-8");
         res.getWriter().write(print);
     }
-    public void response200(HttpServletResponse res, String print, String accessToken) throws IOException {
+    public void response200(HttpServletResponse res, String accessToken) throws IOException {
         res.setStatus(HttpServletResponse.SC_OK);
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
-        res.getWriter().write(print+"\naccessToken: "+ accessToken);
+        res.getWriter().write(accessToken);
     }
 }
 
