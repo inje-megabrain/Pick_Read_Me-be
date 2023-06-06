@@ -6,6 +6,8 @@ import com.example.Pick_Read_Me.Repository.RefreshRepository;
 import com.example.Pick_Read_Me.Util.CookieUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.server.reactive.HttpHandler;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -67,9 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     m.put("githubId", String.valueOf(github_id));
 
                     accessToken = jwtProvider.generateToken(m);
-                    res.addHeader("accessToken", accessToken);  //accessToken 다시 넘겨주기
-
-                    response200(res, "accessToken 재발급");
+                    response200(res, "accessToken 재발급", accessToken);
                     return ;
                 }
                 else {    //IP가 다른 경우 로그아웃 시켜야함
@@ -106,7 +106,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         res.setCharacterEncoding("UTF-8");
         res.getWriter().write(print);
     }
-    public void response200(HttpServletResponse res, String print) throws IOException {
+    public void response200(HttpServletResponse res, String print, String accessToken) throws IOException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("accessToken", accessToken);
         res.setStatus(HttpServletResponse.SC_OK);
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
