@@ -108,7 +108,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
     public void response200(HttpServletResponse res, String print, String accessToken) throws IOException {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("accessToken", accessToken);
+        headers.set("Authorization", accessToken);
         res.setStatus(HttpServletResponse.SC_OK);
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
