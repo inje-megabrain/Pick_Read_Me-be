@@ -16,6 +16,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -76,5 +77,13 @@ public class MemberController {
     public String hea(@RequestHeader MultiValueMap<String, String> h) {
         log.info(h);
         return h.toString();
+    }
+
+    @DeleteMapping("/api/delete/cookie")
+    public void removeCookie(HttpServletResponse response) {
+        Cookie myCookie = new Cookie("refreshToken", null);
+        myCookie.setMaxAge(0); // 쿠키의 expiration 타임을 0으로 하여 없앤다.
+        myCookie.setPath("/"); // 모든 경로에서 삭제 됬음을 알린다.
+        response.addCookie(myCookie);
     }
 }

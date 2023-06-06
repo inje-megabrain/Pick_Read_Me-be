@@ -101,6 +101,7 @@ public class JwtProvider implements AuthenticationProvider {
             DecodedJWT decodedJWT = validateToken(token);
             return false;
         } catch (JWTVerificationException e) {
+            log.info("accessToken 만료");
             return true;
         }
     }
@@ -110,6 +111,7 @@ public class JwtProvider implements AuthenticationProvider {
             DecodedJWT decodedJWT = RefreshvalidateToken(token);
             return false;
         } catch (JWTVerificationException e) {
+            log.info("RefreshToken 만료");
             return true;
         }
     }
@@ -133,4 +135,5 @@ public class JwtProvider implements AuthenticationProvider {
     public boolean supports(Class<?> authentication) {
         return false;
     }
+
 }

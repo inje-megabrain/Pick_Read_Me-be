@@ -46,9 +46,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        if(accessToken==null || jwtProvider.isTokenExpired(accessToken)) {  //accessToken이 없거나 토큰이 만료되었다면
-            log.info("accessToken이 만료된 경우");
-            if (refreshToken != null && !jwtProvider.RefreshisTokenExpired(refreshToken)) { //refreshToken이 만료가 안되었을 경우
+        if(accessToken==null || jwtProvider.isTokenExpired(accessToken)) {  //accessToken 없거나 토큰이 만료되었다면
+            log.info("accessToken 만료된 경우");
+            if (refreshToken != null && !jwtProvider.RefreshisTokenExpired(refreshToken)) { //refreshToken 만료가 안되었을 경우
 
                 Long github_id = Long.valueOf(jwtProvider.getRefreshGithubIdFromToken(refreshToken));
                 log.info(String.valueOf(github_id));
@@ -69,9 +69,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     accessToken = jwtProvider.generateToken(m);
                     res.addHeader("accessToken", accessToken);  //accessToken 다시 넘겨주기
 
-                    response200(res, "리프레시 토큰 통과");
+                    response401(res, "accessToken 재발급");
                     return ;
-
                 }
                 else {    //IP가 다른 경우 로그아웃 시켜야함
                     response401(res, "error: 등록한 IP가 다릅니다.\n"+"다시 로그인 해주세요");
@@ -84,7 +83,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return ;
             } else if(jwtProvider.RefreshisTokenExpired(refreshToken)){ //리프래시 토큰 만료
                 log.info("리프래시 토큰 만료");
-               response401(res, "error : 리프래시 토큰 만료");
+                response401(res, "error : 리프래시 토큰 만료");
                 return ;
             }
         }
@@ -103,12 +102,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public void response401(HttpServletResponse res, String print) throws IOException {
         res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        res.setContentType("application/json");
-        res.setCharacterEncoding("UTF-8");
-        res.getWriter().write(print);
-    }
-    public void response200(HttpServletResponse res, String print) throws IOException {
-        res.setStatus(HttpServletResponse.SC_OK);
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         res.getWriter().write(print);
