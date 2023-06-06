@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         refreshToken = req.getHeader("refreshToken");
 
         if(accessToken==null && refreshToken==null) {       //토큰이 둘다 없다면
-            response401(res, "error: 토큰이 둘다 만료");
+            response401(res, "error : 토큰이 둘다 만료");
             return;
         }
 
@@ -65,15 +65,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         throw new RuntimeException("authenticate 오류!");
                     }
 
-                    HashMap<String, String> m = new HashMap<>();
-                    m.put("githubId", String.valueOf(github_id));
-
-                    accessToken = jwtProvider.generateToken(m);
-                    response200(res, accessToken);
+                    response401(res, "error : accessToken Expired");
                     return ;
                 }
                 else {    //IP가 다른 경우 로그아웃 시켜야함
-                    response401(res, "error: 등록한 IP가 다릅니다.\n"+"다시 로그인 해주세요");
+                    response401(res, "error : 등록한 IP가 다릅니다.\n"+"다시 로그인 해주세요");
                     return ;
                 }
             }
@@ -87,15 +83,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return ;
             }
         }
-        else if(!jwtProvider.isTokenExpired(accessToken)){  //accessToken이 만료가 안되었을 때
-            try {
-                String github_id = jwtProvider.getGithubIdFromToken(accessToken);
-                authenticate = jwtProvider.authenticate(new UsernamePasswordAuthenticationToken(github_id, ""));
-                SecurityContextHolder.getContext().setAuthentication(authenticate);
-            }catch(Exception e) {
-                throw new RemoteException(e.getMessage());
-            }
-        }
         filterChain.doFilter(req, res);
 
     }
@@ -105,12 +92,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         res.getWriter().write(print);
-    }
-    public void response200(HttpServletResponse res, String accessToken) throws IOException {
-        res.setStatus(HttpServletResponse.SC_OK);
-        res.setContentType("application/json");
-        res.setCharacterEncoding("UTF-8");
-        res.getWriter().write(accessToken);
     }
 }
 

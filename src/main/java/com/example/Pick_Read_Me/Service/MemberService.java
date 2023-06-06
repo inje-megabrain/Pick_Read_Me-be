@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 
 @Service
 @Slf4j
@@ -34,5 +35,15 @@ public class MemberService {
         );
 
         return ResponseEntity.ok(getMemberDto);
+    }
+
+    public String getAccessToken(HttpServletRequest request) {
+        String token = request.getHeader("refreshToken");
+        String github_id = jwtProvider.getRefreshGithubIdFromToken(token);
+
+        HashMap<String, String> m = new HashMap<>();
+        m.put("githubId", github_id);
+        String accessToken = jwtProvider.generateToken(m);
+        return accessToken;
     }
 }

@@ -86,4 +86,9 @@ public class MemberController {
         myCookie.setPath("/"); // 모든 경로에서 삭제 됬음을 알린다.
         response.addCookie(myCookie);
     }
+
+    @GetMapping("/api/get/accessToken")
+    public String getAccessToken(HttpServletRequest request) {
+        return memberService.getAccessToken(request);
+    }
 }
