@@ -2,12 +2,10 @@ package com.example.Pick_Read_Me.Controller;
 
 
 import com.example.Pick_Read_Me.Service.CustomOAuth2UserService;
-import com.example.Pick_Read_Me.Service.OauthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,8 +19,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 public class GitHubOAuthController {
 
-    @Autowired
-    private OauthService oauthService;
 
     @Autowired
     private OAuth2AuthorizedClientService authorizedClientService;
@@ -42,9 +38,8 @@ public class GitHubOAuthController {
     private CustomOAuth2UserService customOAuth2UserService;
 
     @GetMapping(value = "code")
-    public String getToken(@RequestParam("code") String code) throws Exception {
-
-        return "!";
+    public void getToken(@RequestParam("code") String code) throws Exception {
+        log.info("여기서는 CustomOauth2UserService가 요청을 가로챕니다");
     }
 }
 

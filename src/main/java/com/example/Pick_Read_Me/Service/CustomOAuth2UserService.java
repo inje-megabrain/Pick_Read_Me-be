@@ -18,6 +18,7 @@ import java.util.*;
 
 @Slf4j
 @Service
+//인가코드를 가로채서 사용자 정보를 가져와줍니다 -> Oauth2UserService -> loadUser
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {

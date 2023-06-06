@@ -42,6 +42,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {
+
         OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
         OauthMemberDto userDto = new OauthMemberDto();
         userDto.setId((Long) oAuth2User.getAttributes().get("id"));

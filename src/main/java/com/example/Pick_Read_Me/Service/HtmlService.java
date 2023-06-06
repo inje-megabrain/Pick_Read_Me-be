@@ -33,7 +33,7 @@ public class HtmlService {
             Graphics2D graphics = image.createGraphics();
 
             // Set the background color
-            graphics.setColor(Color.WHITE);
+            graphics.setColor(Color.BLACK);
             graphics.fillRect(0, 0, width, height);
 
             // Render the HTML content onto the image
@@ -62,6 +62,8 @@ public class HtmlService {
                 int x = Integer.parseInt(element.attr("x"));
                 int y = Integer.parseInt(element.attr("y"));
                 graphics.drawImage(img, x, y, null);
+
+                System.out.println("Image drawn: " + src + ", x: " + x + ", y: " + y);
             }
         } else {
             // If the element is not an <img> tag, recursively render its children
@@ -74,6 +76,7 @@ public class HtmlService {
     private BufferedImage loadImage(String src) throws IOException, java.io.IOException {
         // Load the image from the specified URL
         URL url = new URL(src);
+        log.info(String.valueOf(url));
         return ImageIO.read(url);
     }
 
