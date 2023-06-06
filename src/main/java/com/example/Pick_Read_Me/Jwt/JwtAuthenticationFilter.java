@@ -70,7 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     accessToken = jwtProvider.generateToken(m);
                     response200(res, "accessToken 재발급", accessToken);
-                    return ;
+                   
                 }
                 else {    //IP가 다른 경우 로그아웃 시켜야함
                     response401(res, "error: 등록한 IP가 다릅니다.\n"+"다시 로그인 해주세요");
