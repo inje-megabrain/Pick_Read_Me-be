@@ -12,12 +12,11 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.core.parameters.P;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -69,8 +68,27 @@ public class MemberController {
     }
 
     @Operation(summary = "해당 유저 조회", description = "헤더를 주면 헤더를 까서 DB에서 조회합니다")
-    @GetMapping("/get/members")
+    @GetMapping("/api/get/members")
     public ResponseEntity<GetMemberDto> getMembers(HttpServletRequest request) {
         return memberService.getMembers(request);
+    }
+
+    @GetMapping("/api/header")
+    public String hea(@RequestHeader MultiValueMap<String, String> h) {
+        log.info(h);
+        return h.toString();
+    }
+
+    @DeleteMapping("/api/logout")
+    public void removeCookie(HttpServletResponse response) {
+        Cookie myCookie = new Cookie("refreshToken", null);
+        myCookie.setMaxAge(0); // 쿠키의 expiration 타임을 0으로 하여 없앤다.
+        myCookie.setPath("/"); // 모든 경로에서 삭제 됬음을 알린다.
+        response.addCookie(myCookie);
+    }
+
+    @GetMapping("/api/get/accessToken")
+    public String getAccessToken(HttpServletRequest request) {
+        return memberService.getAccessToken(request);
     }
 }

@@ -17,7 +17,16 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+
+import java.util.Arrays;
+import java.util.logging.Filter;
 
 @Configuration
 @RequiredArgsConstructor
@@ -25,7 +34,6 @@ public class SecurityConfig {
     private final CustomOAuth2UserService oAuth2UserService;
     private final OAuth2SuccessHandler successHandler;
     private final JwtProvider tokenService;
-
     private String[] permitList={
             "/v2/**",
             "/v3/**",
@@ -35,12 +43,12 @@ public class SecurityConfig {
             "/swagger-resources/**",
             "/home/**",
             "/test",
-            "/api/**",
             "/login",
             "/home?accessToken=*",
             "/home\\?accessToken=.*",
-            "/api/**",
             "/test/**",
+            "/api/get/accessToken",
+            "/api/logout"
     };
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
@@ -57,8 +65,23 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {  //해당 URL은 필터 거치지 않겠다
-        return (web -> web.ignoring().antMatchers(permitList));
+        return (web -> web.ignoring().antMatchers(permitList)); //여기는 모든 필터를 거치지 않는 곳
         //return (web -> web.ignoring().antMatchers("/test"));
+    }
+
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://s3-ap-northeast-2.amazonaws.com", "https://github.com", "http://52.78.80.150:9000"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Origin", "X-Requested-With", "Content-Type", "Accept", "Key", "Authorization", "access-control-allow-origin", "Authorizationsecret", "accessToken", "refreshToken"));
+        configuration.setAllowCredentials(true);
+
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return new CorsFilter(source);
     }
 
 
@@ -66,12 +89,12 @@ public class SecurityConfig {
     protected SecurityFilterChain config(HttpSecurity http, JwtProvider jwtProvider,
                                          CookieUtil cookieUtil) throws Exception {
         http
-                .httpBasic().disable()
+                .addFilterBefore(corsFilter(), ChannelProcessingFilter.class)
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests()
-                .antMatchers(permitList).permitAll()
+                .authorizeRequests().antMatchers("/api/**").permitAll()
+                //여기는 권한 즉 user,admin 등등 모든 처리를 하겠다는 걸
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter(jwtProvider, cookieUtil, refreshRepository),
@@ -90,4 +113,6 @@ public class SecurityConfig {
         return http.build();
 
     }
+
+
 }

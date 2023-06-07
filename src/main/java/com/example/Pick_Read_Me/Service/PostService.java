@@ -11,6 +11,7 @@ import com.example.Pick_Read_Me.Exception.MemberNotFoundException;
 import com.example.Pick_Read_Me.Jwt.JwtProvider;
 import com.example.Pick_Read_Me.Repository.MemberRepository;
 import com.example.Pick_Read_Me.Repository.PostRepository;
+import com.example.Pick_Read_Me.Util.CommonUtil;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -72,12 +73,14 @@ public class PostService {
         ResponseEntity<Map> response = restTemplate.exchange(apiUrl, HttpMethod.GET, entity, Map.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
+
             Map<String, Object> responseData = response.getBody();
             String content = (String) responseData.get("content");
             content = content.replace("\n", "");
             // Base64로 인코딩된 내용을 디코딩
             byte[] decodedBytes = Base64.getDecoder().decode(content);
             String decodedContent = new String(decodedBytes, StandardCharsets.UTF_8);
+            log.info(decodedContent);
 
             return decodedContent;
         } else {

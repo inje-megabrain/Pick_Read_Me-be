@@ -28,8 +28,8 @@ public class JwtProvider implements AuthenticationProvider {
 
     private final MyUserDetailsService userDetailsService;
 
-    public static final long TOKEN_VALIDATION_SECOND = 1800L;   //30분
-    public static final long REFRESH_TOKEN_VALIDATION_TIME = 1000L * 60 * 60 * 24 * 3; //3일
+    public static final long TOKEN_VALIDATION_SECOND = 1800L;   // 30분
+    public static final long REFRESH_TOKEN_VALIDATION_TIME = 3024000L; // 14일
 
 
 
@@ -51,7 +51,10 @@ public class JwtProvider implements AuthenticationProvider {
         DecodedJWT verifiedToken = validateToken(token);
         return verifiedToken.getClaim("githubId").asString();
     }
-
+    public String getRefreshGithubIdFromToken(String token) {
+        DecodedJWT verifiedToken = RefreshvalidateToken(token);
+        return verifiedToken.getClaim("githubId").asString();
+    }
     private JWTVerifier getTokenValidator() {
         return JWT.require(getSigningKey(SECRET_KEY))
                 .withIssuer(ISSUER)
@@ -98,6 +101,7 @@ public class JwtProvider implements AuthenticationProvider {
             DecodedJWT decodedJWT = validateToken(token);
             return false;
         } catch (JWTVerificationException e) {
+            log.info("accessToken 만료");
             return true;
         }
     }
@@ -107,6 +111,7 @@ public class JwtProvider implements AuthenticationProvider {
             DecodedJWT decodedJWT = RefreshvalidateToken(token);
             return false;
         } catch (JWTVerificationException e) {
+            log.info("RefreshToken 만료");
             return true;
         }
     }
@@ -130,4 +135,5 @@ public class JwtProvider implements AuthenticationProvider {
     public boolean supports(Class<?> authentication) {
         return false;
     }
+
 }
