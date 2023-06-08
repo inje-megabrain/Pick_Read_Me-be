@@ -50,7 +50,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 try {
                     Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(accessToken));
+
+                    log.info("1");
                     authenticate = jwtProvider.authenticate(new UsernamePasswordAuthenticationToken(github_id, ""));
+                    log.info("1");
                     SecurityContextHolder.getContext().setAuthentication(authenticate);
                     log.info("Security Context Holder에 저장됨");
                     log.info(String.valueOf(authenticate.getName()));

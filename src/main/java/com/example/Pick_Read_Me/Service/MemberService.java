@@ -47,12 +47,15 @@ public class MemberService {
 
         try {
             String github_id = jwtProvider.getRefreshGithubIdFromToken(token);
+
             Refresh r = refreshRepository.findById(Long.valueOf(github_id)).orElseGet(Refresh::new);
+
             if (r.getRefreshToken().equals(token) && r.getIp().equals(request.getRemoteAddr())) {
+
                 HashMap<String, String> m = new HashMap<>();
                 m.put("githubId", github_id);
                 accessToken = jwtProvider.generateToken(m);
-
+                response200(response, accessToken);
 
             }
             else response401(response, "error: IP 다름");
@@ -60,7 +63,7 @@ public class MemberService {
             response401(response, "error : refreshToken 만료");
         }
 
-        response200(response, accessToken);
+
 
         return response;
     }

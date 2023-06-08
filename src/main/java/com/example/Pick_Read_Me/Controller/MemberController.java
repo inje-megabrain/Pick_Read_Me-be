@@ -63,6 +63,7 @@ public class MemberController {
         myCookie.setMaxAge(0); // 쿠키의 expiration 타임을 0으로 하여 없앤다.
         myCookie.setPath("/"); // 모든 경로에서 삭제 됬음을 알린다.
         response.addCookie(myCookie);
+
     }
 
     @Operation(summary = "Refresh Cookie를 통해 accessToken 재발급", description = "재발급 받은 accessToken을 Header로 저장하고 다른 API를 호출하여야 합니다.")
