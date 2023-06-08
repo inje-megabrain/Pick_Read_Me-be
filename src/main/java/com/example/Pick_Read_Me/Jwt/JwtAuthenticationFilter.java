@@ -62,7 +62,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         authenticate = jwtProvider.authenticate(new UsernamePasswordAuthenticationToken(github_id, ""));
                         SecurityContextHolder.getContext().setAuthentication(authenticate);
                     }catch(Exception e){
-                        throw new RuntimeException("authenticate 오류!");
+
+                        log.info(e.getMessage());
                     }
 
                     response401(res, "error : accessToken Expired");

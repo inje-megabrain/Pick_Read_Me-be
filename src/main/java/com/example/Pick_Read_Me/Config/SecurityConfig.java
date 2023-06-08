@@ -48,7 +48,8 @@ public class SecurityConfig {
             "/home\\?accessToken=.*",
             "/test/**",
             "/api/get/accessToken",
-            "/api/logout"
+            "/api/logout",
+            "/test/**"
     };
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
