@@ -50,7 +50,7 @@ public class PostController {
     @PostMapping("/posts")
     @Operation(summary = "글을 작성하는 API",
             description = "repo : 레포이름등등 을 던지면 글 생성")
-    public Post createPost(@AuthenticationPrincipal Authentication authentication,
+    public Post createPost(Authentication authentication,
                            @RequestBody PostsDTO postsDTO) {
         // Post 작성 서비스 호출
         Post createdPost = postService.createPost(authentication, postsDTO);
@@ -61,7 +61,7 @@ public class PostController {
 
     @Operation(summary = "사용자의 전체 글을 조회하는 API")
     @GetMapping("/get/all/posts")
-    public List<Post> selectAllPost(@AuthenticationPrincipal Authentication authentication) {
+    public List<Post> selectAllPost(Authentication authentication) {
 
         List<Post> selectAllPost = postService.selectAllPost(authentication);
         return selectAllPost;
@@ -78,7 +78,7 @@ public class PostController {
 
     @Operation(summary = "글을 삭제하는 API")
     @DeleteMapping("/delete/posts")
-    public boolean deletePost(@AuthenticationPrincipal Authentication authentication, Long post_id) {
+    public boolean deletePost(Authentication authentication, Long post_id) {
 
         boolean deletePost = postService.deletePost(authentication, post_id);
         return deletePost;
@@ -87,7 +87,7 @@ public class PostController {
     @Operation(summary = "게시글 좋아요 API", description = "\n 자기가 좋아요 한 글이면 true반환" +
             "\n좋아요를 달 글 파람으로 받음 -> post_id")
     @PostMapping("/like/posts")
-    public ResponseEntity<Void> postLikes(@AuthenticationPrincipal Authentication authentication,
+    public ResponseEntity<Void> postLikes(Authentication authentication,
                                           @RequestParam Long post_id) {
         postService.postLikes(authentication, post_id);
         return ResponseEntity.ok().build();
@@ -103,7 +103,7 @@ public class PostController {
     @Operation(summary = "게시글 랜덤 무한스크롤 API", description = "게시글을 골라 수정할 수 있습니다.\n" +
             "page는 한 페이지당 얼마만큼의 게시글을 보여줄지 정할 수 있습니다")
     @GetMapping("/get/rand/posts")
-    public Slice<Post> getPosts(@AuthenticationPrincipal Authentication authentication,
+    public Slice<Post> getPosts(Authentication authentication,
                                 @RequestParam int page) {
         return postService.searchByPost(authentication,  PageRequest.ofSize(page));
     }

@@ -87,8 +87,7 @@ public class SecurityConfig {
 
 
     @Bean
-    protected SecurityFilterChain config(HttpSecurity http, JwtProvider jwtProvider,
-                                         CookieUtil cookieUtil) throws Exception {
+    protected SecurityFilterChain config(HttpSecurity http, JwtProvider jwtProvider) throws Exception {
         http
                 .addFilterBefore(corsFilter(), ChannelProcessingFilter.class)
                 .csrf().disable()

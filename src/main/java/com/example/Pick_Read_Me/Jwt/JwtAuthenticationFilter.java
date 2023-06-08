@@ -52,11 +52,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(accessToken));
                     authenticate = jwtProvider.authenticate(new UsernamePasswordAuthenticationToken(github_id, ""));
                     SecurityContextHolder.getContext().setAuthentication(authenticate);
+                    log.info("Security Context Holder에 저장됨");
+                    log.info(String.valueOf(authenticate.getName()));
                 } catch (Exception e) {
+                    log.info("error : accessToken Expired");
                     response401(res, "error : accessToken Expired");
                     return;
                 }
             } catch (Exception e) {
+                log.info("error : Security Context에 저장 실패");
                 response401(res, "error : Security Context에 저장 실패");
                 return;
             }
