@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -55,11 +56,10 @@ public class PostService {
         this.query = new JPAQueryFactory(em);
     }
 
-    public String getReadMe(HttpServletRequest request, String repo_name) {
-        String token = request.getHeader("accessToken");
-        Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(token));
-
-        Member member = memberRepository.findById(github_id).orElseGet(Member::new);
+    public String getReadMe(Authentication authentication, String repo_name) {
+        Long github_id = Long.valueOf(authentication.getName());
+        Member member = memberRepository.findById(Long.valueOf(github_id))
+                .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
         RestTemplate restTemplate = new RestTemplate();
 
         String apiUrl = String.format("https://api.github.com/repos/"+member.getName()+"/"+
@@ -89,12 +89,12 @@ public class PostService {
         }
     }
 
-    public Post createPost(HttpServletRequest request, PostsDTO postsDTO) {
-        String token = request.getHeader("accessToken");
-        Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(token));
-
-        Member member = memberRepository.findById(github_id)
+    public Post createPost(Authentication authentication, PostsDTO postsDTO) {
+        Long github_id = Long.valueOf(authentication.getName());
+        Member member = memberRepository.findById(Long.valueOf(github_id))
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
+
+
 
         Post post = new Post();
         post.setContent(postsDTO.getContent());
@@ -113,10 +113,9 @@ public class PostService {
         return post;
     }
 
-    public List<Post> selectAllPost(HttpServletRequest request) {
-        String token = request.getHeader("accessToken");
-        Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(token));
-        Member member = memberRepository.findById(github_id)
+    public List<Post> selectAllPost(Authentication authentication) {
+        Long github_id = Long.valueOf(authentication.getName());
+        Member member = memberRepository.findById(Long.valueOf(github_id))
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
         return member.getPosts();
     }
@@ -132,11 +131,9 @@ public class PostService {
         return new ResponseEntity<GetPostDto>(getPostDto, HttpStatus.valueOf(200));
     }
 
-    public boolean deletePost(HttpServletRequest request, Long post_id) {
-        String token = request.getHeader("accessToken");
-        Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(token));
-
-        Member member = memberRepository.findById(github_id)
+    public boolean deletePost(Authentication authentication, Long post_id) {
+        Long github_id = Long.valueOf(authentication.getName());
+        Member member = memberRepository.findById(Long.valueOf(github_id))
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
 
         Post post = postRepository.findById(post_id)
@@ -153,9 +150,10 @@ public class PostService {
     }
 
     @Transactional
-    public Post postLikes(HttpServletRequest request, Long post_id) {    //글 좋아요
-        String token = request.getHeader("accessToken");
-        Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(token));
+    public Post postLikes(Authentication authentication, Long post_id) {    //글 좋아요
+        Long github_id = Long.valueOf(authentication.getName());
+        Member member = memberRepository.findById(Long.valueOf(github_id))
+                .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
 
         Optional<Post> optionalPost = postRepository.findById(post_id);
         if (!optionalPost.isPresent()) {  //아이디 없을시 예외처리
@@ -167,7 +165,6 @@ public class PostService {
         if (!optionalMember.isPresent()) {  //아이디 없을시 예외처리
             throw new NoSuchElementException("DB에 존재하지 않는 ID : " + github_id);
         }
-        Member member = optionalMember.get(); //존재한다면 객체 생성
 
         if (post.getLikedMembers().contains(member)) {
             post.removeLike(member);
@@ -198,16 +195,12 @@ public class PostService {
 
 
 
-    public Slice<Post> searchByPost(HttpServletRequest request,  Pageable pageable) {
+    public Slice<Post> searchByPost(Authentication authentication,  Pageable pageable) {
 
-        String token = request.getHeader("accessToken");
-        String github_id = jwtProvider.getGithubIdFromToken(token);
+        Long github_id = Long.valueOf(authentication.getName());
+        Member member = memberRepository.findById(Long.valueOf(github_id))
+                .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
 
-        Optional<Member> optionalMember = memberRepository.findById(Long.valueOf(github_id));
-        if (!optionalMember.isPresent()) {  //아이디 없을시 예외처리
-            throw new NoSuchElementException("DB에 존재하지 않는 ID : " + github_id);
-        }
-        Member member = optionalMember.get(); //존재한다면 객체 생성
 
 
         List<Post> results = query.selectFrom(post)

@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,12 +38,11 @@ public class PostController {
     @Operation(summary = "원하는 Repo의 ReadMe파일을 가져올 수 있는 API",
             description = "Token, 원하는 Repo이름: name 파라미터 필요\n"+"반환값은 makrdown입니다.")
     @GetMapping("/get/readmes")
-    public String getReadme(HttpServletRequest request,
+    public String getReadme(@AuthenticationPrincipal Authentication authentication,
                             @RequestParam("name") String name, Model model) {
-        String token = request.getHeader("accessToken");
-        Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(token));
 
-        String MarkDown= postService.getReadMe(request, name);
+
+        String MarkDown= postService.getReadMe(authentication, name);
         String html = commonUtil.markdown(MarkDown);
         return html;
     }
@@ -49,24 +50,20 @@ public class PostController {
     @PostMapping("/posts")
     @Operation(summary = "글을 작성하는 API",
             description = "repo : 레포이름등등 을 던지면 글 생성")
-    public ResponseEntity<Post> createPost(HttpServletRequest request,
-                                           @RequestBody PostsDTO postsDTO) {
-        String token = request.getHeader("accessToken");
-        Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(token));
+    public Post createPost(@AuthenticationPrincipal Authentication authentication,
+                           @RequestBody PostsDTO postsDTO) {
         // Post 작성 서비스 호출
-        Post createdPost = postService.createPost(request, postsDTO);
+        Post createdPost = postService.createPost(authentication, postsDTO);
 
         // 작성된 Post 객체를 HTTP 응답으로 반환
-        return ResponseEntity.ok(createdPost);
+        return createdPost;
     }
 
     @Operation(summary = "사용자의 전체 글을 조회하는 API")
     @GetMapping("/get/all/posts")
-    public List<Post> selectAllPost(HttpServletRequest request) {
-        String token = request.getHeader("accessToken");
-        Long github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(token));
+    public List<Post> selectAllPost(@AuthenticationPrincipal Authentication authentication) {
 
-        List<Post> selectAllPost = postService.selectAllPost(request);
+        List<Post> selectAllPost = postService.selectAllPost(authentication);
         return selectAllPost;
     }
 
@@ -81,18 +78,18 @@ public class PostController {
 
     @Operation(summary = "글을 삭제하는 API")
     @DeleteMapping("/delete/posts")
-    public boolean deletePost(HttpServletRequest request, Long post_id) {
+    public boolean deletePost(@AuthenticationPrincipal Authentication authentication, Long post_id) {
 
-        boolean deletePost = postService.deletePost(request, post_id);
+        boolean deletePost = postService.deletePost(authentication, post_id);
         return deletePost;
     }
 
     @Operation(summary = "게시글 좋아요 API", description = "\n 자기가 좋아요 한 글이면 true반환" +
             "\n좋아요를 달 글 파람으로 받음 -> post_id")
     @PostMapping("/like/posts")
-    public ResponseEntity<Void> postLikes(HttpServletRequest request,
+    public ResponseEntity<Void> postLikes(@AuthenticationPrincipal Authentication authentication,
                                           @RequestParam Long post_id) {
-        postService.postLikes(request, post_id);
+        postService.postLikes(authentication, post_id);
         return ResponseEntity.ok().build();
     }
 
@@ -106,10 +103,9 @@ public class PostController {
     @Operation(summary = "게시글 랜덤 무한스크롤 API", description = "게시글을 골라 수정할 수 있습니다.\n" +
             "page는 한 페이지당 얼마만큼의 게시글을 보여줄지 정할 수 있습니다")
     @GetMapping("/get/rand/posts")
-    public Slice<Post> getPosts(HttpServletRequest request,
+    public Slice<Post> getPosts(@AuthenticationPrincipal Authentication authentication,
                                 @RequestParam int page) {
-        log.info("!@#!@#!@##@!@#!@#@!");
-        return postService.searchByPost(request,  PageRequest.ofSize(page));
+        return postService.searchByPost(authentication,  PageRequest.ofSize(page));
     }
 
 
