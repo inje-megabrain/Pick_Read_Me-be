@@ -66,6 +66,9 @@ public class JwtProvider implements AuthenticationProvider {
                 .withIssuer(ISSUER)
                 .acceptExpiresAt(REFRESH_TOKEN_VALIDATION_TIME)
                 .build();
+        /*
+        
+         */
     }
 
     public String generateToken(Map<String, String> payload) {
