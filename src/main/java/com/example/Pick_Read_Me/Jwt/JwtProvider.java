@@ -111,7 +111,7 @@ public class JwtProvider implements AuthenticationProvider {
             DecodedJWT decodedJWT = RefreshvalidateToken(token);
             return false;
         } catch (JWTVerificationException e) {
-            log.info("RefreshToken 만료");
+            log.info("리프래시 토큰 만료");
             return true;
         }
     }

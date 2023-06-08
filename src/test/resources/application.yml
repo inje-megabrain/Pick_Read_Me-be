@@ -1,8 +1,6 @@
 server:
   port: 9000
 aws:
-  access-key: AKIAZIZFTLINQWI6VHHE
-  secret-key: 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
   region: ap-northeast-2
   bucket-name: pick-read-me-actions-s3-bucket
 

@@ -6,15 +6,14 @@ import com.example.Pick_Read_Me.Domain.Dto.OAuthDto.GetMemberDto;
 import com.example.Pick_Read_Me.Repository.MemberRepository;
 import com.example.Pick_Read_Me.Service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.security.core.parameters.P;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 @Log4j2
 @RestController
@@ -51,34 +49,13 @@ public class MemberController {
         response.sendRedirect(redirectUrl);
     }
 
-    @Operation(summary = "test server", description = "서버가 가동중인지 테스트하는 코드입니다.\nToken필요 X")
-    @GetMapping("/api/test")
-    public String test() {
-        return "test url입니다. 서버 정상 가동중";
-
-    }
-
-    @Operation(summary = "test server", description = "서버가 가동중인지 테스트하는 코드입니다\n" +
-    "Token이 맞을때만 리턴합니다.")
-    @GetMapping("/token/test")
-    public String test1(HttpServletRequest request) {
-        System.out.println(request.getHeader("accessToken"));
-        System.out.println(request.getHeader("refreshToken"));
-        return "test url입니다!!. 서버 정상 가동중!";
-    }
-
     @Operation(summary = "해당 유저 조회", description = "헤더를 주면 헤더를 까서 DB에서 조회합니다")
     @GetMapping("/api/get/members")
-    public ResponseEntity<GetMemberDto> getMembers(HttpServletRequest request) {
-        return memberService.getMembers(request);
+    public ResponseEntity<GetMemberDto> getMembers(@AuthenticationPrincipal Authentication authentication) {
+        return memberService.getMembers(authentication);
     }
 
-    @GetMapping("/api/header")
-    public String hea(@RequestHeader MultiValueMap<String, String> h) {
-        log.info(h);
-        return h.toString();
-    }
-
+    @Operation(summary = "로그아웃", description = "Refresh 쿠키를 null로 만듭니다.")
     @DeleteMapping("/api/logout")
     public void removeCookie(HttpServletResponse response) {
         Cookie myCookie = new Cookie("refreshToken", null);
@@ -87,8 +64,10 @@ public class MemberController {
         response.addCookie(myCookie);
     }
 
+    @Operation(summary = "Refresh Cookie를 통해 accessToken 재발급", description = "재발급 받은 accessToken을 Header로 저장하고 다른 API를 호출하여야 합니다.")
     @GetMapping("/api/get/accessToken")
-    public String getAccessToken(HttpServletRequest request) {
-        return memberService.getAccessToken(request);
+    public HttpServletResponse getAccessToken(HttpServletRequest request,
+                                              HttpServletResponse response) throws IOException {
+        return memberService.getAccessToken(request, response);
     }
 }

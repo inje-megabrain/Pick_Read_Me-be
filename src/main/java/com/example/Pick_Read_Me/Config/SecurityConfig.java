@@ -60,8 +60,8 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    JwtAuthenticationFilter jwtAuthenticationFilter(JwtProvider jwtProvider, CookieUtil cookieUtil, RefreshRepository refreshRepository) {
-        return new JwtAuthenticationFilter(jwtProvider, cookieUtil, refreshRepository);
+    JwtAuthenticationFilter jwtAuthenticationFilter(JwtProvider jwtProvider, RefreshRepository refreshRepository) {
+        return new JwtAuthenticationFilter(jwtProvider,  refreshRepository);
     }
 
     @Bean
@@ -98,7 +98,7 @@ public class SecurityConfig {
                 //여기는 권한 즉 user,admin 등등 모든 처리를 하겠다는 걸
                 .anyRequest().authenticated()
                 .and()
-                .addFilterBefore(jwtAuthenticationFilter(jwtProvider, cookieUtil, refreshRepository),
+                .addFilterBefore(jwtAuthenticationFilter(jwtProvider,  refreshRepository),
                         UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login()
                 .authorizationEndpoint()

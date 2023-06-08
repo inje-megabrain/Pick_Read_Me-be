@@ -2,15 +2,20 @@ package com.example.Pick_Read_Me.Service;
 
 import com.example.Pick_Read_Me.Domain.Dto.OAuthDto.GetMemberDto;
 import com.example.Pick_Read_Me.Domain.Entity.Member;
+import com.example.Pick_Read_Me.Domain.Entity.Refresh;
 import com.example.Pick_Read_Me.Exception.MemberNotFoundException;
 import com.example.Pick_Read_Me.Jwt.JwtProvider;
 import com.example.Pick_Read_Me.Repository.MemberRepository;
+import com.example.Pick_Read_Me.Repository.RefreshRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.HashMap;
 
 @Service
@@ -18,15 +23,13 @@ import java.util.HashMap;
 public class MemberService {
     @Autowired
     private JwtProvider jwtProvider;
+    @Autowired
+    private RefreshRepository refreshRepository;
 
     @Autowired
     private MemberRepository memberRepository;
-    public ResponseEntity<GetMemberDto> getMembers(HttpServletRequest request) {
-        log.info("a"+request.getHeader("accessToken"));
-        log.info("r"+request.getHeader("refreshToken"));
-        String token = request.getHeader("accessToken");
-        String github_id = jwtProvider.getGithubIdFromToken(token);
-
+    public ResponseEntity<GetMemberDto> getMembers(Authentication authentication) {
+        Long github_id = Long.valueOf(authentication.getName());
         Member member = memberRepository.findById(Long.valueOf(github_id))
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
 
@@ -37,13 +40,40 @@ public class MemberService {
         return ResponseEntity.ok(getMemberDto);
     }
 
-    public String getAccessToken(HttpServletRequest request) {
-        String token = request.getHeader("refreshToken");
-        String github_id = jwtProvider.getRefreshGithubIdFromToken(token);
+    public HttpServletResponse getAccessToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String accessToken = null;
 
-        HashMap<String, String> m = new HashMap<>();
-        m.put("githubId", github_id);
-        String accessToken = jwtProvider.generateToken(m);
-        return accessToken;
+        String token = request.getHeader("refreshToken");
+
+        try {
+            String github_id = jwtProvider.getRefreshGithubIdFromToken(token);
+            Refresh r = refreshRepository.findById(Long.valueOf(github_id)).orElseGet(Refresh::new);
+            if (r.getRefreshToken().equals(token) && r.getIp().equals(request.getRemoteAddr())) {
+                HashMap<String, String> m = new HashMap<>();
+                m.put("githubId", github_id);
+                accessToken = jwtProvider.generateToken(m);
+
+
+            }
+            else response401(response, "error: IP 다름");
+        }catch(Exception e) {
+            response401(response, "error : refreshToken 만료");
+        }
+
+        response200(response, accessToken);
+
+        return response;
+    }
+    public void response401(HttpServletResponse res, String print) throws IOException {
+        res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+        res.getWriter().write(print);
+    }
+    public void response200(HttpServletResponse res, String print) throws IOException {
+        res.setStatus(HttpServletResponse.SC_OK);
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+        res.getWriter().write(print);
     }
 }
