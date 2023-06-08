@@ -44,10 +44,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         refreshToken = req.getHeader("refreshToken");
 
         /*
-        
+
          */
         if(accessToken==null && refreshToken==null) {       //토큰이 둘다 없다면
             response401(res, "error : 토큰이 둘다 만료");
+            log.info("토큰은 안 넣었는데?");
             return;
         }
 
