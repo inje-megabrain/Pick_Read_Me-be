@@ -49,6 +49,7 @@ public class PostController {
             description = "repo : 레포이름등등 을 던지면 글 생성")
     public Post createPost(Authentication authentication,
                            @RequestBody PostsDTO postsDTO) {
+
         // Post 작성 서비스 호출
         Post createdPost = postService.createPost(authentication, postsDTO);
 

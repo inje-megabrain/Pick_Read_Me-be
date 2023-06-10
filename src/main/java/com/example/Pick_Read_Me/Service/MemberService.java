@@ -75,15 +75,27 @@ public class MemberService {
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         PrintWriter writer = res.getWriter();
-        writer.write(print);
-        writer.flush();
+        try{
+            writer.write(print);
+            writer.flush();
+        }catch (Exception e) {
+            res.reset();
+            throw e;
+        }
+
     }
     public void response200(HttpServletResponse res, String print) throws IOException {
         res.setStatus(HttpServletResponse.SC_OK);
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         PrintWriter writer = res.getWriter();
-        writer.write(print);
-        writer.flush();
+        try{
+            writer.write(print);
+            writer.flush();
+        }catch (Exception e) {
+            res.reset();
+            throw e;
+        }
+
     }
 }

@@ -80,8 +80,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         PrintWriter writer = res.getWriter();
-        writer.write(print);
-        writer.flush();
+        try{
+            writer.write(print);
+            writer.flush();
+        }catch (Exception e) {
+            res.reset();
+            throw e;
+        }
     }
 }
 

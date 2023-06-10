@@ -6,6 +6,8 @@ import com.example.Pick_Read_Me.Domain.Dto.PostDto.PostsDTO;
 import com.example.Pick_Read_Me.Domain.Entity.Post;
 import com.example.Pick_Read_Me.Repository.PostRepository;
 import com.example.Pick_Read_Me.Service.PostService;
+import com.example.Pick_Read_Me.Util.CommonUtil;
+import com.google.gson.Gson;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,36 +15,86 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.parameters.P;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.BDDAssumptions.given;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(PostController.class)
+
 class PostControllerTest {
 
-    @Mock
-    private PostRepository postRepository;
+    @Autowired
+    private MockMvc mockMvc;
 
-    @InjectMocks
+    @MockBean
     private PostService postService;
+    @MockBean
+    private CommonUtil commonUtil;
+
+    @Autowired
+    private Gson gson;
 
     @Test
-    @DisplayName("글 작성 ")
-    public void postCreateTest() {
-        //Given
+    @DisplayName("회원인증을 하고 글을 쓸 수 있는가")
+    public void postCreateTest() throws Exception {
+        // Given
         PostsDTO postsDTO = new PostsDTO("Test_Title", "Test_Content", "Test_Repo");
-        // 인증 객체를 생성한다.
-        Authentication authentication = new UsernamePasswordAuthenticationToken("96710732", "");
+        String content = gson.toJson(postsDTO);
+
+        // Mock Post 객체 생성
+        Post createdPost = new Post();
+        createdPost.setId(1L);
+        createdPost.setTitle("Test_Title");
+        createdPost.setContent("Test_Content");
+        createdPost.setRepo("Test_Repo");
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken("96710732", "sleeg00",
+                Arrays.asList(new SimpleGrantedAuthority("ROLE_USER")));
         // SecurityContextHolder를 사용하여 SecurityContext에 인증 객체를 설정한다.
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        given(postService.createPost(Mockito.any(Post.class))).willReturn(new Post());
+        // Mock postService.createPost()의 반환값 설정
+        when(postService.createPost(any(Authentication.class), any(PostsDTO.class)))
+                .thenReturn(createdPost);
 
+        // When
+        mockMvc.perform(post("/api/posts")
+                        .with(csrf())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(createdPost.getId()))
+                .andExpect(jsonPath("$.title").value(createdPost.getTitle()))
+                .andExpect(jsonPath("$.content").value(createdPost.getContent()))
+                .andExpect(jsonPath("$.repo").value(createdPost.getRepo()));
+
+        // Then
+        verify(postService, times(1)).createPost(any(Authentication.class), any(PostsDTO.class));
     }
+
+
 }

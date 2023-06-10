@@ -90,6 +90,7 @@ public class PostService {
     }
 
     public Post createPost(Authentication authentication, PostsDTO postsDTO) {
+        log.info(String.valueOf(authentication));
         Long github_id = Long.valueOf(authentication.getName());
         Member member = memberRepository.findById(Long.valueOf(github_id))
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
