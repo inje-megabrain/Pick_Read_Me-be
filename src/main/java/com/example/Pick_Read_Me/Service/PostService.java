@@ -113,11 +113,9 @@ public class PostService {
         return post;
     }
 
-    public List<Post> selectAllPost(Authentication authentication) {
-        Long github_id = Long.valueOf(authentication.getName());
-        Member member = memberRepository.findById(Long.valueOf(github_id))
-                .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
-        return member.getPosts();
+    public List<Post> selectAllPost() {
+        List<Post> posts = postRepository.findAll();
+        return posts;
     }
 
     public ResponseEntity<GetPostDto> selectPost(Long post_id) {

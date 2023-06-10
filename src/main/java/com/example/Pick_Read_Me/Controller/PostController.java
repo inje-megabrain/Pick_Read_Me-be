@@ -61,9 +61,9 @@ public class PostController {
 
     @Operation(summary = "사용자의 전체 글을 조회하는 API")
     @GetMapping("/get/all/posts")
-    public List<Post> selectAllPost(Authentication authentication) {
+    public List<Post> selectAllPost() {
 
-        List<Post> selectAllPost = postService.selectAllPost(authentication);
+        List<Post> selectAllPost = postService.selectAllPost();
         return selectAllPost;
     }
 

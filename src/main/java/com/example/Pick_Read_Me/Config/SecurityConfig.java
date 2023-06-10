@@ -49,7 +49,8 @@ public class SecurityConfig {
             "/test/**",
             "/api/get/accessToken",
             "/api/logout",
-            "/test/**"
+            "/test/**",
+            "/api/get/all/posts"
     };
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
