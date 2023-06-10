@@ -38,7 +38,7 @@ public class PostController {
     @Operation(summary = "원하는 Repo의 ReadMe파일을 가져올 수 있는 API",
             description = "Token, 원하는 Repo이름: name 파라미터 필요\n"+"반환값은 makrdown입니다.")
     @GetMapping("/get/readmes")
-    public String getReadme(@AuthenticationPrincipal Authentication authentication,
+    public String getReadme(Authentication authentication,
                             @RequestParam("name") String name, Model model) {
 
 
