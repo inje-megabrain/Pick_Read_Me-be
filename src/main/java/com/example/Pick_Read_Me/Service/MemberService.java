@@ -74,28 +74,32 @@ public class MemberService {
         res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
-        PrintWriter writer = res.getWriter();
-        try{
+        PrintWriter writer = null;
+        try {
+            writer = res.getWriter();
             writer.write(print);
             writer.flush();
-        }catch (Exception e) {
-            res.reset();
-            throw e;
+        } finally {
+            if (writer != null) {
+                writer.close(); // 출력 스트림을 닫습니다.
+            }
         }
-
     }
+
     public void response200(HttpServletResponse res, String print) throws IOException {
         res.setStatus(HttpServletResponse.SC_OK);
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
-        PrintWriter writer = res.getWriter();
-        try{
+        PrintWriter writer = null;
+        try {
+            writer = res.getWriter();
             writer.write(print);
             writer.flush();
-        }catch (Exception e) {
-            res.reset();
-            throw e;
+        } finally {
+            if (writer != null) {
+                writer.close(); // 출력 스트림을 닫습니다.
+            }
         }
-
     }
+
 }
