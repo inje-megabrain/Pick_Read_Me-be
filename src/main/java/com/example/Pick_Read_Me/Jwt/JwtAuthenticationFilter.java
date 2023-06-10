@@ -79,7 +79,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
-        res.getWriter().write(print);
+        PrintWriter writer = res.getWriter();
+        writer.write(print);
+        writer.flush();
     }
 }
 
