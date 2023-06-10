@@ -56,16 +56,18 @@ public class MemberService {
                 m.put("githubId", github_id);
                 accessToken = jwtProvider.generateToken(m);
                 response200(response, accessToken);
-
+                return response;
             }
-            else response401(response, "error: IP 다름");
+            else {response401(response, "error: IP 다름");
+                return response;}
         }catch(Exception e) {
             response401(response, "error : refreshToken 만료");
+            return response;
         }
 
 
 
-        return response;
+     
     }
     public void response401(HttpServletResponse res, String print) throws IOException {
         res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

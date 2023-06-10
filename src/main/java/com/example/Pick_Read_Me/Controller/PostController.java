@@ -30,9 +30,6 @@ public class PostController {
     @Autowired
     private CommonUtil commonUtil;
     @Autowired
-    private JwtProvider jwtProvider;
-
-    @Autowired
     private PostService postService;
 
     @Operation(summary = "원하는 Repo의 ReadMe파일을 가져올 수 있는 API",
