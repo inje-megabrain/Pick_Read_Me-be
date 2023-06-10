@@ -1,5 +1,6 @@
 package com.example.Pick_Read_Me;
 
+import com.example.Pick_Read_Me.Controller.PostController;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.PostsDTO;
 import com.example.Pick_Read_Me.Repository.PostRepository;
 import com.example.Pick_Read_Me.Service.PostService;
@@ -9,10 +10,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.parameters.P;
 
-@ExtendWith(MockitoExtension.class)
-class PostServiceTest {
+@WebMvcTest(PostController.class)
+class PostControllerTest {
 
     @Mock
     private PostRepository postRepository;
@@ -24,7 +27,7 @@ class PostServiceTest {
     @DisplayName("글 작성 ")
     public void postCreateTest() {
         //Given
-        PostsDTO postsDTO = new PostsDTO("Test_title", "Test_Content", "Test_Repo");
+        PostsDTO postsDTO = new PostsDTO("Test_Title", "Test_Content", "Test_Repo");
 
     }
 }
