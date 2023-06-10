@@ -28,8 +28,8 @@ public class JwtProvider implements AuthenticationProvider {
 
     private final MyUserDetailsService userDetailsService;
 
-    public static final long TOKEN_VALIDATION_SECOND = 1800L;   // 30분
-    public static final long REFRESH_TOKEN_VALIDATION_TIME = 60*1440L; // 14일
+    public static final long TOKEN_VALIDATION_SECOND = 60L;//1800L;   // 30분
+    public static final long REFRESH_TOKEN_VALIDATION_TIME = 180L;// 60*1440L; // 14일
 
 
 
