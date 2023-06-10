@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 
 @Service
@@ -67,18 +68,24 @@ public class MemberService {
 
 
 
-     
+
     }
     public void response401(HttpServletResponse res, String print) throws IOException {
         res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         res.getWriter().write(print);
+        PrintWriter writer = res.getWriter();
+        writer.write(print);
+        writer.flush();
     }
     public void response200(HttpServletResponse res, String print) throws IOException {
         res.setStatus(HttpServletResponse.SC_OK);
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         res.getWriter().write(print);
+        PrintWriter writer = res.getWriter();
+        writer.write(print);
+        writer.flush();
     }
 }

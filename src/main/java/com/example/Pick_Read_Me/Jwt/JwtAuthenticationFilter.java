@@ -17,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.rmi.RemoteException;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -79,6 +80,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         res.getWriter().write(print);
+        PrintWriter writer = res.getWriter();
+        writer.write(print);
+        writer.flush();
     }
 }
 
