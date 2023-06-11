@@ -56,12 +56,11 @@ public class MemberController {
 
     @Operation(summary = "로그아웃", description = "Refresh 쿠키를 null로 만듭니다.")
     @DeleteMapping("/api/logout")
-    public HttpServletResponse removeCookie(HttpServletResponse response) {
+    public void removeCookie(HttpServletResponse response) {
         Cookie myCookie = new Cookie("refreshToken", null);
         myCookie.setMaxAge(0); // 쿠키의 expiration 타임을 0으로 하여 없앤다.
         myCookie.setPath("/"); // 모든 경로에서 삭제 됬음을 알린다.
         response.addCookie(myCookie);
-        return response;
     }
 
     @Operation(summary = "Refresh Cookie를 통해 accessToken 재발급", description = "재발급 받은 accessToken을 Header로 저장하고 다른 API를 호출하여야 합니다.")

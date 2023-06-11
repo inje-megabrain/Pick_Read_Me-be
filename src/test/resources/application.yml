@@ -1,8 +1,5 @@
 server:
   port: 9000
-aws:
-  region: ap-northeast-2
-  bucket-name: pick-read-me-actions-s3-bucket
 
 spring:
   datasource:
