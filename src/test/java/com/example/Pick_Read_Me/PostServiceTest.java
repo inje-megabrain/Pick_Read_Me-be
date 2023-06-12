@@ -26,9 +26,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.parameters.P;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -57,9 +59,12 @@ class PostControllerTest {
     @Autowired
     private Gson gson;
 
+    @Autowired
+    private PostRepository postRepository;
+
     @Test
     @DisplayName("회원인증을 하고 글을 쓸 수 있는가")
-    public void postCreateTest() throws Exception {
+    public void 글작성_테스트() throws Exception {
         // Given
         PostsDTO postsDTO = new PostsDTO("Test_Title", "Test_Content", "Test_Repo");
         String content = gson.toJson(postsDTO);
@@ -95,6 +100,37 @@ class PostControllerTest {
         // Then
         verify(postService, times(1)).createPost(any(Authentication.class), any(PostsDTO.class));
     }
+
+    /*
+    @Test
+    @DisplayName("모든 글 조회")
+    public void 모든글_조회 () throws Exception {
+
+        // Given
+        Authentication authentication = new UsernamePasswordAuthenticationToken("96710732", "sleeg00",
+                Arrays.asList(new SimpleGrantedAuthority("ROLE_USER")));
+        // SecurityContextHolder를 사용하여 SecurityContext에 인증 객체를 설정한다.
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        List<Post> createdPost = new ArrayList<>();
+
+        // Mock postService.createPost()의 반환값 설정
+        when(postService.selectAllPost())
+                .thenReturn((List<Post>) createdPost);
+
+        // When
+        mockMvc.perform(post("/api/get/all/posts")
+                        .with(csrf())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(createdPost.get(0).getId()));
+
+        // Then
+        verify(postService, times(1)).selectAllPost();
+    }
+    
+     */
+
 
 
 }
