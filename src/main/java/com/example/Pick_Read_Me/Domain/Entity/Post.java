@@ -21,19 +21,19 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name="title")
+    @Column(name="title", nullable = false)
     private String title;
 
     @Column(name = "content")
     private String content;
 
-    @Column(name = "postCreatedAt")
+    @Column(name = "postCreatedAt", nullable = false)
     private Date postCreatedAt;
 
-    @Column(name = "postUpdateAt")
+    @Column(name = "postUpdateAt", nullable = false)
     private Date postUpdatedAt;
 
-    @Column(name = "repo")
+    @Column(name = "repo", nullable = false)
     private String repo;
 
     @Column(name = "postLike")

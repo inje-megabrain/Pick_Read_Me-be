@@ -3,7 +3,6 @@ package com.example.Pick_Read_Me.Controller;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.GetPostDto;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.PostsDTO;
 import com.example.Pick_Read_Me.Domain.Entity.Post;
-import com.example.Pick_Read_Me.Jwt.JwtProvider;
 import com.example.Pick_Read_Me.Service.PostService;
 import com.example.Pick_Read_Me.Util.CommonUtil;
 import io.swagger.annotations.Api;
@@ -14,11 +13,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -46,15 +43,13 @@ public class PostController {
 
     @PostMapping("/posts")
     @Operation(summary = "글을 작성하는 API",
-            description = "repo : 레포이름등등 을 던지면 글 생성")
-    public Post createPost(Authentication authentication,
-                           @RequestBody PostsDTO postsDTO) {
+            description = "repo : 레포이름 등등 을 던지면 글 생성")
+    public ResponseEntity<Post> createPost(Authentication authentication,
+                                            @RequestBody PostsDTO postsDTO) {
 
         // Post 작성 서비스 호출
-        Post createdPost = postService.createPost(authentication, postsDTO);
+        return postService.createPost(authentication, postsDTO);
 
-        // 작성된 Post 객체를 HTTP 응답으로 반환
-        return createdPost;
     }
 
     @Operation(summary = "사용자의 전체 글을 조회하는 API")
@@ -106,5 +101,10 @@ public class PostController {
         return postService.searchByPost(authentication,  PageRequest.ofSize(page));
     }
 
-
+    @Operation(summary = "게시글 목록에서 선택하면 상세보기하는 API", description = "게시글 ID를 주면 조회할 수 있습니다")
+    @GetMapping("/get/detail/post")
+    public Post getDetailPost(Authentication authentication,
+                              @RequestParam int post_id) {
+        return postService.getDetailPost(authentication, post_id);
+    }
 }

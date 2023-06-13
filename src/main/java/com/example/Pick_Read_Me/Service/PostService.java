@@ -1,19 +1,13 @@
 package com.example.Pick_Read_Me.Service;
 
-import com.example.Pick_Read_Me.BasicResponse;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.GetPostDto;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.PostsDTO;
-import com.example.Pick_Read_Me.Domain.Dto.PostDto.SelectAllPost;
 import com.example.Pick_Read_Me.Domain.Entity.Member;
 import com.example.Pick_Read_Me.Domain.Entity.Post;
-import com.example.Pick_Read_Me.Domain.Entity.QPost;
 import com.example.Pick_Read_Me.Exception.MemberNotFoundException;
 import com.example.Pick_Read_Me.Jwt.JwtProvider;
 import com.example.Pick_Read_Me.Repository.MemberRepository;
 import com.example.Pick_Read_Me.Repository.PostRepository;
-import com.example.Pick_Read_Me.Util.CommonUtil;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -27,11 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityManager;
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.example.Pick_Read_Me.Domain.Entity.QPost.post;
 
@@ -47,6 +39,7 @@ public class PostService {
 
     @Autowired
     private JwtProvider jwtProvider;
+
 
     private final EntityManager em;
     private final JPAQueryFactory query;
@@ -89,13 +82,15 @@ public class PostService {
         }
     }
 
-    public Post createPost(Authentication authentication, PostsDTO postsDTO) {
+    public ResponseEntity<Post> createPost(Authentication authentication, PostsDTO postsDTO) {
         log.info(String.valueOf(authentication));
         Long github_id = Long.valueOf(authentication.getName());
         Member member = memberRepository.findById(Long.valueOf(github_id))
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
 
 
+        if (postsDTO.getTitle() == null || postsDTO.getTitle().isEmpty())
+            return ResponseEntity.badRequest().body(null);
 
         Post post = new Post();
         post.setContent(postsDTO.getContent());
@@ -111,7 +106,8 @@ public class PostService {
         postRepository.save(post);
         memberRepository.save(member);
 
-        return post;
+
+        return ResponseEntity.ok().body(post);
     }
 
     public List<Post> selectAllPost() {
@@ -230,4 +226,6 @@ public class PostService {
     }
 
 
+    public Post getDetailPost(Authentication authentication, int post_id) {
+    }
 }

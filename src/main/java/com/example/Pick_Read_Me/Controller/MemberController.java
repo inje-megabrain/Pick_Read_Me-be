@@ -69,4 +69,6 @@ public class MemberController {
                                               HttpServletResponse response) throws IOException {
         return memberService.getAccessToken(request, response);
     }
+
+
 }
