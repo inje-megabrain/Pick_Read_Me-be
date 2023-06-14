@@ -96,15 +96,15 @@ public class PostController {
     @Operation(summary = "게시글 랜덤 무한스크롤 API", description = "게시글을 골라 수정할 수 있습니다.\n" +
             "page는 한 페이지당 얼마만큼의 게시글을 보여줄지 정할 수 있습니다")
     @GetMapping("/get/rand/posts")
-    public Slice<Post> getPosts(Authentication authentication,
-                                @RequestParam int page) {
-        return postService.searchByPost(authentication,  PageRequest.ofSize(page));
+    public Slice<GetPostDto> getPosts(Authentication authentication,
+                                      @RequestParam int page) {
+        return postService.searchByPost(PageRequest.ofSize(page));
     }
 
     @Operation(summary = "게시글 목록에서 선택하면 상세보기하는 API", description = "게시글 ID를 주면 조회할 수 있습니다")
     @GetMapping("/get/detail/post")
     public Post getDetailPost(Authentication authentication,
-                              @RequestParam int post_id) {
+                              @RequestParam Long post_id) {
         return postService.getDetailPost(authentication, post_id);
     }
 }

@@ -55,10 +55,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // 최초 로그인이라면 회원가입 처리를 한다.
         Member find = memberRepository.findById(userDto.getId()).orElseGet(Member::new);
         Refresh checkIp = refreshRepository.findById(userDto.getId()).orElseGet(Refresh::new);
-        if(find!=null && request.getRemoteAddr().equals(checkIp.getIp())) {
-
-
-            String targetUrl;
+        if(find!=null) {
+            log.info("업데이트");
             log.info("토큰 발행 시작");
 
             HashMap<String, String> m = new HashMap<>();
@@ -70,25 +68,26 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
             String ip = request.getRemoteAddr();
 
-            Refresh refresh = new Refresh();
+            find.setName(String.valueOf(oAuth2User.getAttributes().get("name")));
+            find.setEmail(String.valueOf(oAuth2User.getAttributes().get("email")));
+            find.setRepo(String.valueOf(oAuth2User.getAttributes().get("repo")));
+            find.setProfile(String.valueOf(oAuth2User.getAttributes().get("profile")));
+            find.setUpdated(new Date());
+            find.setRoles(Collections.singletonList("USER"));
 
-            Member member = new Member();
-            member.setId((Long) oAuth2User.getAttributes().get("id"));
-            member.setName(String.valueOf(oAuth2User.getAttributes().get("name")));
-            member.setEmail(String.valueOf(oAuth2User.getAttributes().get("email")));
-            member.setRepo(String.valueOf(oAuth2User.getAttributes().get("repo")));
-            member.setProfile(String.valueOf(oAuth2User.getAttributes().get("profile")));
-            member.setUpdated(new Date());
-            member.setRoles(Collections.singletonList("USER"));
 
-            refresh.setMember(member);
-            refresh.setRefreshToken(token.getRefreshToken());
-            refresh.setIp(request.getRemoteAddr());
-            refresh.setId(member.getId());
-            member.setRefresh(refresh);
+            checkIp.setMember(find);
+            checkIp.setRefreshToken(token.getRefreshToken());
+            checkIp.setId(find.getId());
 
-            memberRepository.save(member);
-            refreshRepository.save(refresh);
+            if(!ip.equals(checkIp.getIp())) {
+                checkIp.setIp(ip);
+            }
+
+            find.setRefresh(checkIp);
+
+            memberRepository.save(find);
+            refreshRepository.save(checkIp);
 
 
 
@@ -99,7 +98,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             String redirectUrl = uriBuilder.toUriString();
             getRedirectStrategy().sendRedirect(request, response, redirectUrl);
         }
-        else {
+        else if(find==null){
 
 
                 String targetUrl;
@@ -126,6 +125,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 member.setUpdated(new Date());
                 member.setRoles(Collections.singletonList("USER"));
                 member.setPassword("");
+
 
                 refresh.setMember(member);
                 refresh.setRefreshToken(token.getRefreshToken());

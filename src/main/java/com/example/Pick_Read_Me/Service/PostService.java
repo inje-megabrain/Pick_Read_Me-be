@@ -24,6 +24,7 @@ import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.example.Pick_Read_Me.Domain.Entity.QPost.post;
 
@@ -119,10 +120,8 @@ public class PostService {
 
         Post post = postRepository.findById(post_id)
                 .orElseThrow(() -> new MemberNotFoundException("post not found with id: " + post_id));
-        GetPostDto getPostDto = new GetPostDto(
-          post.getId(), post.getTitle(), post.getContent(),post.getPostCreatedAt(), post.getPostUpdatedAt(),
-          post.getRepo(), post.getPost_like(), post.getLikedMembers(), post.getMember()
-        );
+        GetPostDto getPostDto = new GetPostDto(post.getId(), post.getTitle(),
+                post.getContent(), post.getRepo(), post.getPost_like(), post.getMember().getName(), post.getPostCreatedAt(), post.getPostUpdatedAt());
         return new ResponseEntity<GetPostDto>(getPostDto, HttpStatus.valueOf(200));
     }
 
@@ -190,29 +189,27 @@ public class PostService {
 
 
 
-    public Slice<Post> searchByPost(Authentication authentication,  Pageable pageable) {
+    public Slice<GetPostDto> searchByPost(Pageable pageable) {
 
-        Long github_id = Long.valueOf(authentication.getName());
-        Member member = memberRepository.findById(Long.valueOf(github_id))
-                .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
-
-
-
-        List<Post> results = query.selectFrom(post)
-                .where(
-                        post.member.notIn(member)
-                )
+        List<GetPostDto> results = query.selectFrom(post)
+                .where()
                 .orderBy(Expressions.numberTemplate(Double.class, "function('rand')").asc())
-                .limit(pageable.getPageSize()+1)
-                .fetch();
+                .limit(pageable.getPageSize() + 1)
+                .fetch()
+                .stream()
+                .map(this::mapToGetPostDto) // Post 엔티티를 GetPostDto로 매핑
+                .collect(Collectors.toList());
 
         return checkLastPage(pageable, results);
     }
 
-    /*
-
-     */
-    private Slice<Post> checkLastPage(Pageable pageable, List<Post> results) {
+    private GetPostDto mapToGetPostDto(Post post) {
+        GetPostDto getPostDto = new GetPostDto(post.getId(), post.getTitle(),
+                post.getContent(), post.getRepo(), post.getPost_like(), post.getMember().getName(), post.getPostCreatedAt(), post.getPostUpdatedAt());
+        return getPostDto;
+        // 추가적으로 필요한 데이터를 매핑합니다
+    }
+    private Slice<GetPostDto> checkLastPage(Pageable pageable, List<GetPostDto> results) {
 
         boolean hasNext = false;
 
@@ -226,6 +223,11 @@ public class PostService {
     }
 
 
-    public Post getDetailPost(Authentication authentication, int post_id) {
+    public Post getDetailPost(Authentication authentication, Long post_id) {
+        Long github_id = Long.valueOf(authentication.getName());
+        Member member = memberRepository.findById(Long.valueOf(github_id))
+                .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
+        Post post =  postRepository.findById(post_id).orElseGet(Post::new);
+        return post;
     }
 }
