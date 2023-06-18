@@ -20,7 +20,7 @@ public class ThumbnailService {
     @Autowired
     private S3Client s3Client;
 
-    @Value("${aws.bucket-name}")
+    @Value("${aws.credentials.bucket-name}")
     private String bucket;
 
     public void saveThumbnailToS3(byte[] thumbnailData, String fileName) {
@@ -36,6 +36,7 @@ public class ThumbnailService {
                     .build();
             log.info(String.valueOf(imageData));
             PutObjectResponse response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(thumbnailData));
+
 
             System.out.println("Thumbnail uploaded to S3. ETag: " + response.eTag());
         } catch (Exception e) {

@@ -4,12 +4,11 @@ package com.example.Pick_Read_Me.Service;
 import io.jsonwebtoken.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
+
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
+import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -19,6 +18,7 @@ import java.net.URL;
 @Slf4j
 public class HtmlService {
 
+    /*
     public BufferedImage HtmlToImage(String htmlContent) {
         try {
             // Parse the HTML content using Jsoup
@@ -105,4 +105,6 @@ public class HtmlService {
             throw new RuntimeException(e);
         }
     }
+
+     */
 }

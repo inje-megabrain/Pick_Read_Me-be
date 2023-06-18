@@ -13,13 +13,13 @@ import java.net.URI;
 @Configuration
 public class AwsS3Config {
 
-    @Value("${aws.access-key}")
+    @Value("${aws.credentials.access-key}")
     private String accessKey;
 
-    @Value("${aws.secret-key}")
+    @Value("${aws.credentials.secret-key}")
     private String secretKey;
 
-    @Value("${aws.region}")
+    @Value("${aws.credentials.region}")
     private String region;
 
     @Bean
