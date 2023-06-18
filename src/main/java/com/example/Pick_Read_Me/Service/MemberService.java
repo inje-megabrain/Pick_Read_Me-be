@@ -41,6 +41,9 @@ public class MemberService {
         return ResponseEntity.ok(getMemberDto);
     }
 
+    /*
+    
+     */
     public HttpServletResponse getAccessToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String accessToken = null;
 
