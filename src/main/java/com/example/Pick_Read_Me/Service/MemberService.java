@@ -42,7 +42,7 @@ public class MemberService {
     }
 
     /*
-    
+
      */
     public HttpServletResponse getAccessToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String accessToken = null;

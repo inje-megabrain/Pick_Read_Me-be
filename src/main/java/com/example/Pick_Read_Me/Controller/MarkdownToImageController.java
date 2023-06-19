@@ -34,14 +34,11 @@ public class MarkdownToImageController {
 
     @PostMapping("/markdownToImage")
     public String markdownToImage(@RequestBody String html, @RequestParam String repoName) {
-
-            // 이미지 URL 추출
-            List<String> imageUrls = extractImageUrlsFromHtml(html, repoName);
-
-        return "";
+        // 이미지 URL 추출
+        return extractImageUrlsFromHtml(html, repoName);
     }
 
-    private List<String> extractImageUrlsFromHtml(String html, String repoName) {
+    private String extractImageUrlsFromHtml(String html, String repoName) {
         List<String> imageUrls = new ArrayList<>();
 
         Document document = Jsoup.parse(html);
@@ -104,12 +101,10 @@ public class MarkdownToImageController {
                 html = html.replace(imageUrls.get(i), newImageUrl);
 
                 PutObjectResponse response = s3Client.putObject(putObjectRequest, software.amazon.awssdk.core.sync.RequestBody.fromFile(tempFilePath));
-                System.out.println("Image uploaded to S3 successfully."+i);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        log.info(html);
-        return imageUrls;
+        return html;
     }
 }
