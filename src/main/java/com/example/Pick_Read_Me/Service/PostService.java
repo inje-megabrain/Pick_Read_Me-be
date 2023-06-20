@@ -86,6 +86,9 @@ public class PostService {
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
+        /*
+        
+         */
         ResponseEntity<Map> response = restTemplate.exchange(apiUrl, HttpMethod.GET, entity, Map.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
@@ -255,7 +258,7 @@ public class PostService {
 
     public String extractImageUrlsFromHtml(String html, String repoName) {
         List<String> imageUrls = new ArrayList<>();
-
+        log.info(html);
         Document document = Jsoup.parse(html);
 
 
@@ -320,6 +323,7 @@ public class PostService {
                 e.printStackTrace();
             }
         }
+
         return html;
     }
 }
