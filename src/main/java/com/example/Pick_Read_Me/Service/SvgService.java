@@ -20,6 +20,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
@@ -49,18 +50,25 @@ public class SvgService {
 
         // SVG를 PNG로 변환
         PNGTranscoder transcoder = new PNGTranscoder();
-        TranscoderInput input = new TranscoderInput(tempFile.toURI().toString());
         File pngFile = File.createTempFile("temp", "png");
-        try (FileOutputStream fos = new FileOutputStream(pngFile)) {
-            TranscoderOutput output = new TranscoderOutput(fos);
-            transcoder.transcode(input, output);
+        try (FileInputStream fis = new FileInputStream(tempFile)) {
+            TranscoderInput input = new TranscoderInput(fis);
+            try (FileOutputStream fos = new FileOutputStream(pngFile)) {
+                TranscoderOutput output = new TranscoderOutput(fos);
+                transcoder.transcode(input, output);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (java.io.IOException e) {
+                throw new RuntimeException(e);
+            } catch (TranscoderException e) {
+                throw new RuntimeException(e);
+            }
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (java.io.IOException e) {
             throw new RuntimeException(e);
-        } catch (TranscoderException e) {
-            throw new RuntimeException(e);
         }
+
 
         try {
             PutObjectRequest objectRequest = PutObjectRequest.builder()
