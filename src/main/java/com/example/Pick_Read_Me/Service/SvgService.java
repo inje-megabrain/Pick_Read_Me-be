@@ -1,6 +1,7 @@
 package com.example.Pick_Read_Me.Service;
 
 import io.jsonwebtoken.io.IOException;
+import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.PNGTranscoder;
@@ -46,15 +47,31 @@ public class SvgService {
             throw new RuntimeException(e);
         }
 
+        // SVG를 PNG로 변환
+        PNGTranscoder transcoder = new PNGTranscoder();
+        TranscoderInput input = new TranscoderInput(tempFile.toURI().toString());
+        File pngFile = File.createTempFile("temp", "png");
+        try (FileOutputStream fos = new FileOutputStream(pngFile)) {
+            TranscoderOutput output = new TranscoderOutput(fos);
+            transcoder.transcode(input, output);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (java.io.IOException e) {
+            throw new RuntimeException(e);
+        } catch (TranscoderException e) {
+            throw new RuntimeException(e);
+        }
+
         try {
             PutObjectRequest objectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(fileName)
+                    .key(fileName + ".png") // 확장자 변경하여 저장
                     .build();
 
-            s3Client.putObject(objectRequest, RequestBody.fromFile(tempFile));
+            s3Client.putObject(objectRequest, RequestBody.fromFile(pngFile));
 
             tempFile.delete(); // 임시 파일 삭제
+            pngFile.delete(); // PNG 파일 삭제
 
             return ResponseEntity.ok("1");
         } catch (S3Exception e) {
