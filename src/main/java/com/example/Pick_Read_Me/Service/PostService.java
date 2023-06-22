@@ -11,6 +11,7 @@ import com.example.Pick_Read_Me.Repository.PostRepository;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.batik.transcoder.TranscoderException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -111,7 +112,7 @@ public class PostService {
         }
     }
 
-    public ResponseEntity<Post> createPost(Authentication authentication, PostsDTO postsDTO, MultipartFile file) throws IOException {
+    public ResponseEntity<Post> createPost(Authentication authentication, PostsDTO postsDTO, MultipartFile file) throws IOException, TranscoderException {
         log.info(String.valueOf(authentication));
         Long github_id = Long.valueOf(authentication.getName());
         Member member = memberRepository.findById(Long.valueOf(github_id))
@@ -134,7 +135,7 @@ public class PostService {
 
         postRepository.save(post);
         memberRepository.save(member);
-        svgService.convertToPNG(file);
+        svgService.convertToSvg(file);
 
         return ResponseEntity.ok().body(post);
     }

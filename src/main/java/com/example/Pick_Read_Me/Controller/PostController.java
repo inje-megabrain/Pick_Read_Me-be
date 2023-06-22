@@ -8,6 +8,7 @@ import com.example.Pick_Read_Me.Util.CommonUtil;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.batik.transcoder.TranscoderException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -61,7 +62,7 @@ public class PostController {
     @Operation(summary = "글을 작성하는 API", description = "repo : 레포이름 등등 을 던지면 글 생성")
     public ResponseEntity<Post> createPost(Authentication authentication,
                                            @ModelAttribute PostsDTO postsDTO,
-                                           @RequestParam("file") MultipartFile file) throws IOException {
+                                           @RequestParam("file") MultipartFile file) throws IOException, TranscoderException {
 
         // Post 작성 서비스 호출
         return postService.createPost(authentication, postsDTO, file);
