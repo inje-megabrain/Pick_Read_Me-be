@@ -65,7 +65,7 @@ public class SvgService {
         try {
             PutObjectRequest objectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(fileName + ".png") // 확장자 변경하여 저장
+                    .key(fileName + ".svg") // 확장자 변경하여 저장
                     .build();
 
             s3Client.putObject(objectRequest, RequestBody.fromFile(pngFile));
