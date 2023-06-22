@@ -87,7 +87,7 @@ public class PostService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         /*
-        
+
          */
         ResponseEntity<Map> response = restTemplate.exchange(apiUrl, HttpMethod.GET, entity, Map.class);
 
