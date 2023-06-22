@@ -1,6 +1,7 @@
 package com.example.Pick_Read_Me.Service;
 
 
+import com.example.Pick_Read_Me.Domain.Dto.OAuthDto.GitHubOrganization;
 import com.example.Pick_Read_Me.Domain.Dto.OAuthDto.OauthMemberDto;
 import com.example.Pick_Read_Me.Domain.Dto.OAuthDto.Token;
 import com.example.Pick_Read_Me.Domain.Entity.Member;
@@ -12,19 +13,26 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
+import java.net.URI;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,12 +46,53 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private MemberRepository memberRepository;
     @Autowired
     private RefreshRepository refreshRepository;
+    @Autowired
+    private OAuth2AuthorizedClientService authorizedClientService;
+
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {
 
+
+
+        OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
+        OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(
+                oauthToken.getAuthorizedClientRegistrationId(), oauthToken.getName());
+        OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
+        String tokenValue = accessToken.getTokenValue();
+       log.info("tokenValue:"+tokenValue);
+        WebClient webClient = WebClient.create();
+
+// Build the request URL
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("https://api.github.com/users/sleeg00/orgs");
+
+// Set the headers, including the access token
+        WebClient.RequestHeadersSpec<?> requestSpec = webClient.get()
+                .uri(uriBuilder.build().toUri())
+                .header("Authorization", " Bearer " + tokenValue)
+                .accept(MediaType.APPLICATION_JSON);
+
+// Send the request and retrieve the response
+        Mono<GitHubOrganization[]> responseMono = requestSpec.retrieve()
+                .bodyToMono(GitHubOrganization[].class);
+
+// Process the response
+        responseMono.subscribe(organizations -> {
+            // Handle the organizations array
+            if (organizations != null) {
+                List<GitHubOrganization> organizationList = Arrays.asList(organizations);
+
+                // Perform your desired logic with the organizationList
+                // Example: Print the organization names
+                for (GitHubOrganization organization : organizationList) {
+                    System.out.println("Organization: " + organization.getLogin());
+                }
+            }
+        });
+
         OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
+
         OauthMemberDto userDto = new OauthMemberDto();
         userDto.setId((Long) oAuth2User.getAttributes().get("id"));
         userDto.setName((String) oAuth2User.getAttributes().get("name"));
@@ -92,7 +141,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
 
             log.info("{}", token);
-            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("/home")
+            UriComponentsBuilder uriBuilder2 = UriComponentsBuilder.fromUriString("/home")
                     .queryParam("accessToken", token.getAccessToken())
                     .queryParam("refreshToken", token.getRefreshToken());
             String redirectUrl = uriBuilder.toUriString();
@@ -139,7 +188,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
 
                 log.info("{}", token);
-                UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("/home")
+                UriComponentsBuilder uriBuilder2 = UriComponentsBuilder.fromUriString("/home")
                         .queryParam("accessToken", token.getAccessToken())
                         .queryParam("refreshToken", token.getRefreshToken());
                 String redirectUrl = uriBuilder.toUriString();

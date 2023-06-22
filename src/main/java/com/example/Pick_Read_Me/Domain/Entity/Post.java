@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,6 +25,7 @@ public class Post {
     @Column(name="title", nullable = false)
     private String title;
 
+    @Size(max = 500)
     @Column(name = "content")
     private String content;
 

@@ -35,7 +35,7 @@ public class MemberService {
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
 
         GetMemberDto getMemberDto = new GetMemberDto(
-                member.getName(),member.getProfile(),member.getRepo(), member.getEmail()
+                member.getName(),member.getRepo(),member.getProfile(), member.getEmail(), member.getPosts().size()
         );
 
         return ResponseEntity.ok(getMemberDto);

@@ -37,7 +37,7 @@ public class SvgService {
         }
 
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        File tempFile = File.createTempFile("temp", null);
+        File tempFile = File.createTempFile("temp", "svg");
         try (FileOutputStream fos = new FileOutputStream(tempFile)) {
             fos.write(file.getBytes());
         } catch (FileNotFoundException e) {
