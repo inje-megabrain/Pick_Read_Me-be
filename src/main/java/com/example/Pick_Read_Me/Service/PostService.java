@@ -24,6 +24,7 @@ import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
@@ -64,6 +65,8 @@ public class PostService {
     @Value("${baseurl}")
     private String baseUrl ;
 
+    @Autowired
+    private SvgService svgService;
     private final EntityManager em;
     private final JPAQueryFactory query;
 
@@ -108,7 +111,7 @@ public class PostService {
         }
     }
 
-    public ResponseEntity<Post> createPost(Authentication authentication, PostsDTO postsDTO) {
+    public ResponseEntity<Post> createPost(Authentication authentication, PostsDTO postsDTO, MultipartFile file) throws IOException {
         log.info(String.valueOf(authentication));
         Long github_id = Long.valueOf(authentication.getName());
         Member member = memberRepository.findById(Long.valueOf(github_id))
@@ -131,7 +134,7 @@ public class PostService {
 
         postRepository.save(post);
         memberRepository.save(member);
-
+        svgService.convertToPNG(file);
 
         return ResponseEntity.ok().body(post);
     }

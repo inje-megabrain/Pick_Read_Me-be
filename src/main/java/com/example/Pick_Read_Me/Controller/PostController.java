@@ -15,10 +15,12 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
@@ -55,16 +57,17 @@ public class PostController {
         return postService.extractImageUrlsFromHtml(html, name);
     }
 
-    @PostMapping("/posts")
-    @Operation(summary = "글을 작성하는 API",
-            description = "repo : 레포이름 등등 을 던지면 글 생성")
+    @PostMapping(value = "/post/posts", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
+    @Operation(summary = "글을 작성하는 API", description = "repo : 레포이름 등등 을 던지면 글 생성")
     public ResponseEntity<Post> createPost(Authentication authentication,
-                                            @RequestBody PostsDTO postsDTO) {
+                                           @ModelAttribute PostsDTO postsDTO,
+                                           @RequestParam("file") MultipartFile file) throws IOException {
 
         // Post 작성 서비스 호출
-        return postService.createPost(authentication, postsDTO);
-
+        return postService.createPost(authentication, postsDTO, file);
     }
+
+
 
     @Operation(summary = "사용자의 전체 글을 조회하는 API")
     @GetMapping("/get/all/posts")
