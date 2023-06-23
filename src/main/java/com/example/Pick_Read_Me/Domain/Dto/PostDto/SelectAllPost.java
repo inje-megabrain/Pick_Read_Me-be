@@ -26,12 +26,15 @@ public class SelectAllPost {
 
     private Long post_like;
 
-    public SelectAllPost(Long id, String title, String content, Date postUpdatedAt, String repo, Long post_like) {
+    private Long member_id;
+
+    public SelectAllPost(Long id, String title, String content, Date postUpdatedAt, String repo, Long post_like, Long member_id) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.postUpdatedAt = postUpdatedAt;
         this.repo = repo;
         this.post_like = post_like;
+        this.member_id = member_id;
     }
 }
