@@ -1,6 +1,5 @@
 package com.example.Pick_Read_Me.Service;
 
-
 import com.example.Pick_Read_Me.Domain.Dto.OAuthDto.OauthMemberDto;
 import com.example.Pick_Read_Me.Domain.Dto.OAuthDto.Token;
 import com.example.Pick_Read_Me.Domain.Entity.Member;
@@ -25,7 +24,6 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,16 +48,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Autowired
     private OAuth2AuthorizedClientService authorizedClientService;
 
-
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {
 
-
-
         OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
-
-
 
         OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
 
@@ -94,7 +87,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             find.setUpdated(new Date());
             find.setRoles(Collections.singletonList("USER"));
 
-
             checkIp.setMember(find);
             checkIp.setRefreshToken(token.getRefreshToken());
             checkIp.setId(find.getId());
@@ -108,8 +100,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             memberRepository.save(find);
             refreshRepository.save(checkIp);
 
-
-
             log.info("{}", token);
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("/home")
                     .queryParam("accessToken", token.getAccessToken())
@@ -118,8 +108,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             getRedirectStrategy().sendRedirect(request, response, redirectUrl);
         }
         else if(find==null){
-
-
                 String targetUrl;
                 log.info("토큰 발행 시작");
 
@@ -145,7 +133,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 member.setRoles(Collections.singletonList("USER"));
                 member.setPassword("");
 
-
                 refresh.setMember(member);
                 refresh.setRefreshToken(token.getRefreshToken());
                 refresh.setIp(request.getRemoteAddr());
@@ -154,8 +141,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
                 memberRepository.save(member);
                 refreshRepository.save(refresh);
-
-
 
                 log.info("{}", token);
                 UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("/home")

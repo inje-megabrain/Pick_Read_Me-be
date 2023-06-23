@@ -15,6 +15,7 @@ import java.util.List;
 @Getter
 public class SelectAllPost {
 
+    private Long id;
     private String title;
 
     private String content;
@@ -25,7 +26,8 @@ public class SelectAllPost {
 
     private Long post_like;
 
-    public SelectAllPost(String title, String content, Date postUpdatedAt, String repo, Long post_like) {
+    public SelectAllPost(Long id, String title, String content, Date postUpdatedAt, String repo, Long post_like) {
+        this.id = id;
         this.title = title;
         this.content = content;
         this.postUpdatedAt = postUpdatedAt;

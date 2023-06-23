@@ -149,7 +149,7 @@ public class PostService {
         List<SelectAllPost> selectAllPosts = new ArrayList<>();
         for(int i=0; i<posts.size(); i++) {
             Post p = posts.get(i);
-            SelectAllPost selectAllPost = new SelectAllPost(p.getTitle(), p.getContent(), p.getPostUpdatedAt(), p.getRepo(),
+            SelectAllPost selectAllPost = new SelectAllPost(p.getId(), p.getTitle(), p.getContent(), p.getPostUpdatedAt(), p.getRepo(),
                     p. getPost_like());
             selectAllPosts.add(selectAllPost);
         }
