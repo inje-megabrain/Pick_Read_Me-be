@@ -25,4 +25,11 @@ public class SelectAllPost {
 
     private Long post_like;
 
+    public SelectAllPost(String title, String content, Date postUpdatedAt, String repo, Long post_like) {
+        this.title = title;
+        this.content = content;
+        this.postUpdatedAt = postUpdatedAt;
+        this.repo = repo;
+        this.post_like = post_like;
+    }
 }

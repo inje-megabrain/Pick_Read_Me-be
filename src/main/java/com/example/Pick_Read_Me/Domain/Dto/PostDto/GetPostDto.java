@@ -32,4 +32,7 @@ public class GetPostDto {
         this.create_time = create_time;
         this.update_time = update_time;
     }
+
+
+
 }

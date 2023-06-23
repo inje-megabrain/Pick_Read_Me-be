@@ -2,6 +2,7 @@ package com.example.Pick_Read_Me.Controller;
 
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.GetPostDto;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.PostsDTO;
+import com.example.Pick_Read_Me.Domain.Dto.PostDto.SelectAllPost;
 import com.example.Pick_Read_Me.Domain.Entity.Post;
 import com.example.Pick_Read_Me.Service.PostService;
 import com.example.Pick_Read_Me.Util.CommonUtil;
@@ -9,6 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.batik.transcoder.TranscoderException;
+import org.jooq.Select;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -49,13 +51,14 @@ public class PostController {
             description = "Token, 원하는 Repo이름: name 파라미터 필요\n"+"반환값은 makrdown입니다.")
     @GetMapping("/get/readmes")
     public String getReadme(Authentication authentication,
-                            @RequestParam("name") String name, Model model) {
+                            @RequestParam("name") String name) {
 
 
         String MarkDown= postService.getReadMe(authentication, name);
         String html = commonUtil.markdown(MarkDown);
 
-        return postService.extractImageUrlsFromHtml(html, name);
+       // return postService.extractImageUrlsFromHtml(html, name);
+        return html;
     }
 
     @PostMapping(value = "/post/posts", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
@@ -72,10 +75,10 @@ public class PostController {
 
     @Operation(summary = "사용자의 전체 글을 조회하는 API")
     @GetMapping("/get/all/posts")
-    public List<Post> selectAllPost() {
+    public List<SelectAllPost> selectAllPost() {
 
-        List<Post> selectAllPost = postService.selectAllPost();
-        return selectAllPost;
+        List<SelectAllPost> selectAllPosts = postService.selectAllPost();
+        return selectAllPosts;
     }
 
 
@@ -121,7 +124,7 @@ public class PostController {
 
     @Operation(summary = "게시글 목록에서 선택하면 상세보기하는 API", description = "게시글 ID를 주면 조회할 수 있습니다")
     @GetMapping("/get/detail/post")
-    public Post getDetailPost(Authentication authentication,
+    public GetPostDto getDetailPost(Authentication authentication,
                               @RequestParam Long post_id) {
         return postService.getDetailPost(authentication, post_id);
     }

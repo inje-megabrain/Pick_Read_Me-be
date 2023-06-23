@@ -2,6 +2,7 @@ package com.example.Pick_Read_Me.Service;
 
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.GetPostDto;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.PostsDTO;
+import com.example.Pick_Read_Me.Domain.Dto.PostDto.SelectAllPost;
 import com.example.Pick_Read_Me.Domain.Entity.Member;
 import com.example.Pick_Read_Me.Domain.Entity.Post;
 import com.example.Pick_Read_Me.Exception.MemberNotFoundException;
@@ -12,6 +13,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.batik.transcoder.TranscoderException;
+import org.jooq.Select;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -39,6 +41,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -140,9 +144,26 @@ public class PostService {
         return ResponseEntity.ok().body(post);
     }
 
-    public List<Post> selectAllPost() {
+    public List<SelectAllPost> selectAllPost() {
         List<Post> posts = postRepository.findAll();
-        return posts;
+        List<SelectAllPost> selectAllPosts = new ArrayList<>();
+        for(int i=0; i<posts.size(); i++) {
+            Post p = posts.get(i);
+            SelectAllPost selectAllPost = new SelectAllPost(p.getTitle(), p.getContent(), p.getPostUpdatedAt(), p.getRepo(),
+                    p. getPost_like());
+            selectAllPosts.add(selectAllPost);
+        }
+        return selectAllPosts;
+    }
+
+    private Date parseDate(String dateString) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            return dateFormat.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public ResponseEntity<GetPostDto> selectPost(Long post_id) {
@@ -252,12 +273,14 @@ public class PostService {
     }
 
 
-    public Post getDetailPost(Authentication authentication, Long post_id) {
+    public GetPostDto getDetailPost(Authentication authentication, Long post_id) {
         Long github_id = Long.valueOf(authentication.getName());
         Member member = memberRepository.findById(Long.valueOf(github_id))
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
         Post post =  postRepository.findById(post_id).orElseGet(Post::new);
-        return post;
+        GetPostDto getPostDto = new GetPostDto(post.getId(), post.getTitle(), post.getContent(),
+                post.getRepo(), post.getPost_like(), post.getRepo(), post.getPostUpdatedAt(), post.getPostUpdatedAt());
+        return getPostDto;
     }
 
     public String extractImageUrlsFromHtml(String html, String repoName) {

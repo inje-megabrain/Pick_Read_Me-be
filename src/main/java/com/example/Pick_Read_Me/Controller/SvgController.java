@@ -21,7 +21,6 @@ public class SvgController {
 
     @PostMapping(value = "/convertToPNG", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> convertToPNG(@RequestParam("file") MultipartFile file) throws IOException, java.io.IOException {
-        return svgService.convertToPNG(file);
     }
 
 }
