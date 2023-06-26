@@ -48,7 +48,7 @@ public class PostController {
     }
     @Operation(summary = "원하는 Repo의 ReadMe파일을 가져올 수 있는 API",
             description = "Token, 원하는 Repo이름: name 파라미터 필요\n"+"반환값은 makrdown입니다.")
-    @GetMapping
+    @GetMapping("/get/searchMyPosts")
     public List<GetPostDto> getMyPosts(Authentication authentication) {
         return postService.searchByMyPost(authentication);
 
@@ -120,6 +120,5 @@ public class PostController {
                               @RequestParam Long post_id) {
         return postService.getDetailPost(authentication, post_id);
     }
-
 
 }
