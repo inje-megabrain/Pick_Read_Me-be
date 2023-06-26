@@ -10,30 +10,16 @@ import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.batik.transcoder.TranscoderException;
-import org.jooq.Select;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -60,7 +46,13 @@ public class PostController {
        // return postService.extractImageUrlsFromHtml(html, name);
         return html;
     }
+    @Operation(summary = "원하는 Repo의 ReadMe파일을 가져올 수 있는 API",
+            description = "Token, 원하는 Repo이름: name 파라미터 필요\n"+"반환값은 makrdown입니다.")
+    @GetMapping
+    public List<GetPostDto> getMyPosts(Authentication authentication) {
+        return postService.searchByMyPost(authentication);
 
+    }
     @PostMapping(value = "/post/posts", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
     @Operation(summary = "글을 작성하는 API", description = "repo : 레포이름 등등 을 던지면 글 생성")
     public ResponseEntity<Post> createPost(Authentication authentication,

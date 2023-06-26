@@ -13,7 +13,6 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.batik.transcoder.TranscoderException;
-import org.jooq.Select;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -253,6 +252,23 @@ public class PostService {
         return checkLastPage(pageable, results);
     }
 
+    public List<GetPostDto> searchByMyPost(Authentication authentication) {
+        Long github_id = Long.valueOf(authentication.getName());
+        Member member = memberRepository.findById(Long.valueOf(github_id))
+                .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
+        Post post = new Post();
+        List<GetPostDto> getPostDtos = new ArrayList<>();
+        List<Post> posts = member.getPosts();
+        for(int i=0; i<posts.size(); i++) {
+
+            post = posts.get(i);
+            GetPostDto getPostDto = new GetPostDto(post.getId(), post.getTitle(), post.getContent(),
+                    post.getRepo(), post.getPost_like(), post.getRepo(), post.getPostUpdatedAt(), post.getPostUpdatedAt());
+            getPostDtos.add(getPostDto);
+        }
+        return getPostDtos;
+
+    }
     private GetPostDto mapToGetPostDto(Post post) {
         GetPostDto getPostDto = new GetPostDto(post.getId(), post.getTitle(),
                 post.getContent(), post.getRepo(), post.getPost_like(), post.getMember().getName(), post.getPostCreatedAt(), post.getPostUpdatedAt());
@@ -282,6 +298,7 @@ public class PostService {
                 post.getRepo(), post.getPost_like(), post.getRepo(), post.getPostUpdatedAt(), post.getPostUpdatedAt());
         return getPostDto;
     }
+
 
     public String extractImageUrlsFromHtml(String html, String repoName) {
         List<String> imageUrls = new ArrayList<>();
