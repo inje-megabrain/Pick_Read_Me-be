@@ -46,8 +46,8 @@ public class PostController {
        // return postService.extractImageUrlsFromHtml(html, name);
         return html;
     }
-    @Operation(summary = "원하는 Repo의 ReadMe파일을 가져올 수 있는 API",
-            description = "Token, 원하는 Repo이름: name 파라미터 필요\n"+"반환값은 makrdown입니다.")
+    @Operation(summary = "자기글 무한 스크롤",
+            description = "자기글을 조회할 수 있습니다")
     @GetMapping("/get/searchMyPosts")
     public List<GetPostDto> getMyPosts(Authentication authentication) {
         return postService.searchByMyPost(authentication);
@@ -109,9 +109,8 @@ public class PostController {
     @Operation(summary = "게시글 랜덤 무한스크롤 API", description = "게시글을 골라 수정할 수 있습니다.\n" +
             "page는 한 페이지당 얼마만큼의 게시글을 보여줄지 정할 수 있습니다")
     @GetMapping("/get/rand/posts")
-    public Slice<GetPostDto> getPosts(Authentication authentication,
-                                      @RequestParam int page) {
-        return postService.searchByPost(PageRequest.ofSize(page));
+    public Slice<GetPostDto> getPosts() {
+        return postService.searchByPost(PageRequest.ofSize(10));
     }
 
     @Operation(summary = "게시글 목록에서 선택하면 상세보기하는 API", description = "게시글 ID를 주면 조회할 수 있습니다")
