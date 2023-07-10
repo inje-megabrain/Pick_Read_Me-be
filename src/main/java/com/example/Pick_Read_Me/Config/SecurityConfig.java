@@ -51,7 +51,9 @@ public class SecurityConfig {
             "/api/logout",
             "/test/**",
             "/api/get/all/posts",
-            "/api/get/rand/posts"
+            "/api/get/rand/posts",
+            "/frontend",
+            "/frontend/**",
     };
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
