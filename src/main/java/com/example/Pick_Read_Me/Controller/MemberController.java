@@ -32,7 +32,10 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
 
-
+    @GetMapping("/frontend")
+    public String frontend() {
+        return "헉!";
+    }
 
     @GetMapping("/home")
     public void home(HttpServletRequest request, HttpServletResponse response,
