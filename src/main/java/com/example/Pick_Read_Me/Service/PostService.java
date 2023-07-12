@@ -143,6 +143,7 @@ public class PostService {
         return ResponseEntity.ok().body(post);
     }
 
+    /*
     public List<SelectAllPost> selectAllPost() {
         List<Post> posts = postRepository.findAll();
         List<SelectAllPost> selectAllPosts = new ArrayList<>();
@@ -154,6 +155,8 @@ public class PostService {
         }
         return selectAllPosts;
     }
+
+     */
 
     private Date parseDate(String dateString) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -242,7 +245,7 @@ public class PostService {
 
         List<GetPostDto> results = query.selectFrom(post)
                 .where()
-                .orderBy(Expressions.numberTemplate(Double.class, "function('rand')").asc())
+                .orderBy(post.id.desc()) // post_id를 내림차순으로 정렬
                 .limit(pageable.getPageSize() + 1)
                 .fetch()
                 .stream()

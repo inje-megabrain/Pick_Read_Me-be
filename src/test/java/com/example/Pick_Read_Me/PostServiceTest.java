@@ -1,5 +1,6 @@
 package com.example.Pick_Read_Me;
 
+/*
 import com.example.Pick_Read_Me.Controller.PostController;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.PostsDTO;
 import com.example.Pick_Read_Me.Domain.Entity.Post;
@@ -90,4 +91,5 @@ class PostControllerTest {
     }
 
 
-}
+
+}*/

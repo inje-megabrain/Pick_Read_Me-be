@@ -65,6 +65,7 @@ public class PostController {
 
 
 
+    /*
     @Operation(summary = "사용자의 전체 글을 조회하는 API")
     @GetMapping("/get/all/posts")
     public List<SelectAllPost> selectAllPost() {
@@ -72,6 +73,9 @@ public class PostController {
         List<SelectAllPost> selectAllPosts = postService.selectAllPost();
         return selectAllPosts;
     }
+
+     */
+
 
 
     @Operation(summary = "사용자의 글 한 개를 조회하는 API")
@@ -106,8 +110,7 @@ public class PostController {
         return postService.updatePost(post_id, postsDTO);
     }
 
-    @Operation(summary = "게시글 랜덤 무한스크롤 API", description = "게시글을 골라 수정할 수 있습니다.\n" +
-            "page는 한 페이지당 얼마만큼의 게시글을 보여줄지 정할 수 있습니다")
+    @Operation(summary = "게시글 무한스크롤 API", description = "그냥 10개씩 조호됩니다.")
     @GetMapping("/get/rand/posts")
     public Slice<GetPostDto> getPosts() {
         return postService.searchByPost(PageRequest.ofSize(10));
