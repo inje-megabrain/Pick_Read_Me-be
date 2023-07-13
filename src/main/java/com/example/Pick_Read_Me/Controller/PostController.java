@@ -4,6 +4,7 @@ import com.example.Pick_Read_Me.Domain.Dto.PostDto.GetPostDto;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.PostsDTO;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.SelectAllPost;
 import com.example.Pick_Read_Me.Domain.Entity.Post;
+import com.example.Pick_Read_Me.Repository.PostRepository;
 import com.example.Pick_Read_Me.Service.PostService;
 import com.example.Pick_Read_Me.Util.CommonUtil;
 import io.swagger.annotations.Api;
@@ -13,6 +14,7 @@ import org.apache.batik.transcoder.TranscoderException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -27,14 +29,16 @@ import java.util.List;
 @RequestMapping("/api")
 @Slf4j
 public class PostController {
+    @Autowired
+    private PostRepository postRepository;
 
     @Autowired
     private CommonUtil commonUtil;
     @Autowired
     private PostService postService;
 
-    @Operation(summary = "원하는 Repo의 ReadMe파일을 가져올 수 있는 API",
-            description = "Token, 원하는 Repo이름: name 파라미터 필요\n"+"반환값은 makrdown입니다.")
+    @Operation(summary = "원하는 Repo의 ReadMe파일을 가져올 수 있는 API (accessToken 필수)",
+            description = "예시)/get/readmes?name=sleeg00를 URL로 입력하면 sleeg00의 Markdown를 가져오고 html로 Parsing해서 반환합니다.")
     @GetMapping("/get/readmes")
     public String getReadme(Authentication authentication,
                             @RequestParam("name") String name) {
@@ -46,15 +50,20 @@ public class PostController {
        // return postService.extractImageUrlsFromHtml(html, name);
         return html;
     }
-    @Operation(summary = "자기글 무한 스크롤",
-            description = "자기글을 조회할 수 있습니다")
+
+    @Operation(summary = "자기글 무한 스크롤(AccessToken 필수)",
+            description = "자기글을 모두 조회합니다.")
     @GetMapping("/get/searchMyPosts")
     public List<GetPostDto> getMyPosts(Authentication authentication) {
         return postService.searchByMyPost(authentication);
 
     }
+
+
+
     @PostMapping(value = "/post/posts", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
-    @Operation(summary = "글을 작성하는 API", description = "repo : 레포이름 등등 을 던지면 글 생성")
+    @Operation(summary = "글을 작성, Readme를 저장하는 API(AccessToken 필수)", description = "예시) api/post/posts?file=맘대로\n" +
+            "Json을 넘기고 파일을 넘기면 S3에 readme를 저장하고, 글을 저장합니다")
     public ResponseEntity<Post> createPost(Authentication authentication,
                                            @ModelAttribute PostsDTO postsDTO,
                                            @RequestParam("file") MultipartFile file) throws IOException, TranscoderException {
@@ -65,8 +74,8 @@ public class PostController {
 
 
 
-    /*
-    @Operation(summary = "사용자의 전체 글을 조회하는 API")
+
+    @Operation(summary = "모든 사용자의 전체 글을 조회하는 API")
     @GetMapping("/get/all/posts")
     public List<SelectAllPost> selectAllPost() {
 
@@ -74,28 +83,28 @@ public class PostController {
         return selectAllPosts;
     }
 
-     */
 
 
 
-    @Operation(summary = "사용자의 글 한 개를 조회하는 API")
+
+    @Operation(summary = "사용자의 글 한 개를 조회하는 API", description = "예시) /api/get/posts?post_id=5를 URL로 호출하면 5번째 글을 조회합니다.")
     @GetMapping("/get/posts")
-    public ResponseEntity<GetPostDto> selectPost(Long post_id) {
+    public ResponseEntity<GetPostDto> selectPost(@RequestParam("post_id") Long post_id) {
 
         return postService.selectPost(post_id);
     }
 
 
-    @Operation(summary = "글을 삭제하는 API")
+    @Operation(summary = "글을 삭제하는 API(AccessToken 필수)", description = "예시) /api/delete/posts?post_id=5를하면 5번째 글을 삭제시킵니다.")
     @DeleteMapping("/delete/posts")
-    public boolean deletePost(Authentication authentication, Long post_id) {
+    public boolean deletePost(Authentication authentication, @RequestParam("post_id") Long post_id) {
 
         boolean deletePost = postService.deletePost(authentication, post_id);
         return deletePost;
     }
 
-    @Operation(summary = "게시글 좋아요 API", description = "\n 자기가 좋아요 한 글이면 true반환" +
-            "\n좋아요를 달 글 파람으로 받음 -> post_id")
+    @Operation(summary = "게시글 좋아요 API(AccessToken 필수)", description = "예시) /api/like/posts?post_id=5를 하면 만약 5번글에 좋아요를 처음 누르는 글이라면 true반환\n"+
+    "이미 누른 글이라면 false를 반환합니다.")
     @PostMapping("/like/posts")
     public ResponseEntity<Void> postLikes(Authentication authentication,
                                           @RequestParam Long post_id) {
@@ -110,13 +119,21 @@ public class PostController {
         return postService.updatePost(post_id, postsDTO);
     }
 
-    @Operation(summary = "게시글 무한스크롤 API", description = "그냥 10개씩 조호됩니다.")
+    @Operation(summary = "게시글 무한스크롤 API", description = "예시)" +
+            "/api/get/rand/posts?last_post=50이면 50번부터 40번까지의 글이 조호됩니다.")
     @GetMapping("/get/rand/posts")
-    public Slice<GetPostDto> getPosts() {
-        return postService.searchByPost(PageRequest.ofSize(10));
+    public Slice<GetPostDto> getPosts(@RequestParam("last_post") Long last_post) {
+        return postService.searchByPost(last_post, PageRequest.ofSize(10));
     }
 
-    @Operation(summary = "게시글 목록에서 선택하면 상세보기하는 API", description = "게시글 ID를 주면 조회할 수 있습니다")
+    @Operation(summary = "마지막 게시글을 확인할 수 있는 API", description = "마지막 게시글 번호를 확인할 수 있습니다.")
+    @GetMapping("/get/last/post_id")
+    public ResponseEntity<Integer> getLastPostId() {
+        return new ResponseEntity<Integer>(postRepository.findAll().size(), HttpStatus.OK);
+    }
+
+    @Operation(summary = "게시글 목록에서 선택하면 상세보기하는 API", description = "예시)" +
+            "/api/get/detail/post?post_id=5 5번게시글을 상세 조회할 수 있습니다")
     @GetMapping("/get/detail/post")
     public GetPostDto getDetailPost(Authentication authentication,
                               @RequestParam Long post_id) {

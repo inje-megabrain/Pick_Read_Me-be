@@ -9,6 +9,7 @@ import com.example.Pick_Read_Me.Exception.MemberNotFoundException;
 import com.example.Pick_Read_Me.Jwt.JwtProvider;
 import com.example.Pick_Read_Me.Repository.MemberRepository;
 import com.example.Pick_Read_Me.Repository.PostRepository;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -67,7 +68,7 @@ public class PostService {
     private String bucket;
 
     @Value("${baseurl}")
-    private String baseUrl ;
+    private String baseUrl;
 
     @Autowired
     private SvgService svgService;
@@ -79,14 +80,15 @@ public class PostService {
         this.query = new JPAQueryFactory(em);
     }
 
+    //사용자가 입력한 repo_name의 readme파일을 가져와 마크다운으로 반환합니다.
     public String getReadMe(Authentication authentication, String repo_name) {
         Long github_id = Long.valueOf(authentication.getName());
         Member member = memberRepository.findById(Long.valueOf(github_id))
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
         RestTemplate restTemplate = new RestTemplate();
 
-        String apiUrl = String.format("https://api.github.com/repos/"+member.getName()+"/"+
-                repo_name+"/readme");
+        String apiUrl = String.format("https://api.github.com/repos/" + member.getName() + "/" +
+                repo_name + "/readme");
         log.info(apiUrl);
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent", "Your-User-Agent"); // GitHub API 요청 시 User-Agent 헤더 필요
@@ -143,20 +145,19 @@ public class PostService {
         return ResponseEntity.ok().body(post);
     }
 
-    /*
+
     public List<SelectAllPost> selectAllPost() {
         List<Post> posts = postRepository.findAll();
         List<SelectAllPost> selectAllPosts = new ArrayList<>();
-        for(int i=0; i<posts.size(); i++) {
+        for (int i = 0; i < posts.size(); i++) {
             Post p = posts.get(i);
             SelectAllPost selectAllPost = new SelectAllPost(p.getId(), p.getTitle(), p.getContent(), p.getPostUpdatedAt(), p.getRepo(),
-                    p. getPost_like(), p.getMember().getName());
+                    p.getPost_like(), p.getMember().getName());
             selectAllPosts.add(selectAllPost);
         }
         return selectAllPosts;
     }
 
-     */
 
     private Date parseDate(String dateString) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -184,13 +185,13 @@ public class PostService {
 
         Post post = postRepository.findById(post_id)
                 .orElseThrow(() -> new MemberNotFoundException("Post not found with id: " + post_id));
-        try{
+        try {
             postRepository.deleteById(post_id);
             member.getPosts().remove(post);
 
             memberRepository.save(member);
             return true;
-        }catch(Exception e) {
+        } catch (Exception e) {
             return false;
         }
     }
@@ -232,7 +233,7 @@ public class PostService {
         post.setTitle(postsDTO.getTitle());
 
         PostsDTO postsDTO1 = new PostsDTO(
-            postsDTO.getTitle(),postsDTO.getContent(), postsDTO.getRepo()
+                postsDTO.getTitle(), postsDTO.getContent(), postsDTO.getRepo()
         );
         postRepository.save(post);
 
@@ -240,11 +241,12 @@ public class PostService {
     }
 
 
-
-    public Slice<GetPostDto> searchByPost(Pageable pageable) {
+    public Slice<GetPostDto> searchByPost(Long lastPostId, Pageable pageable) {
 
         List<GetPostDto> results = query.selectFrom(post)
-                .where()
+                .where(
+                        ltPostId(lastPostId)
+                )
                 .orderBy(post.id.desc()) // post_id를 내림차순으로 정렬
                 .limit(pageable.getPageSize() + 1)
                 .fetch()
@@ -255,6 +257,30 @@ public class PostService {
         return checkLastPage(pageable, results);
     }
 
+    // no-offset 방식 처리하는 메서드
+    private BooleanExpression ltPostId(Long lastPostId) {
+        if (lastPostId == null) {
+            return null;
+        }
+
+        return post.id.lt(lastPostId);
+    }
+
+    // 무한 스크롤 방식 처리하는 메서드
+    private Slice<GetPostDto> checkLastPage(Pageable pageable, List<GetPostDto> results) {
+
+        boolean hasNext = false;
+
+        // 조회한 결과 개수가 요청한 페이지 사이즈보다 크면 뒤에 더 있음, next = true
+        if (results.size() > pageable.getPageSize()) {
+            hasNext = true;
+            results.remove(pageable.getPageSize());
+        }
+
+        return new SliceImpl<>(results, pageable, hasNext);
+    }
+
+    //본인글 조회
     public List<GetPostDto> searchByMyPost(Authentication authentication) {
         Long github_id = Long.valueOf(authentication.getName());
         Member member = memberRepository.findById(Long.valueOf(github_id))
@@ -278,18 +304,7 @@ public class PostService {
         return getPostDto;
         // 추가적으로 필요한 데이터를 매핑합니다
     }
-    private Slice<GetPostDto> checkLastPage(Pageable pageable, List<GetPostDto> results) {
 
-        boolean hasNext = false;
-
-        // 조회한 결과 개수가 요청한 페이지 사이즈보다 크면 뒤에 더 있음, next = true
-        if (results.size() > pageable.getPageSize()) {
-            hasNext = true;
-            results.remove(pageable.getPageSize());
-        }
-
-        return new SliceImpl<>(results, pageable, hasNext);
-    }
 
 
     public GetPostDto getDetailPost(Authentication authentication, Long post_id) {

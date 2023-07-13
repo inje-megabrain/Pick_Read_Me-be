@@ -37,7 +37,7 @@ public class MemberController {
         return "헉!";
     }
 
-    @GetMapping("/home")
+    @GetMapping("/home") //리다이렉트 필수
     public void home(HttpServletRequest request, HttpServletResponse response,
                      @RequestParam("accessToken") String accessToken,
                      @RequestParam("refreshToken") String refreshToken) throws IOException {
@@ -50,14 +50,16 @@ public class MemberController {
         response.sendRedirect(redirectUrl);
     }
 
-    @Operation(summary = "해당 유저 조회", description = "헤더를 주면 헤더를 까서 DB에서 조회합니다")
+
+
+    @Operation(summary = "해당 유저 조회", description = "AccessToken을 헤더로 주면 회원정보를 조회합니다.")
     @GetMapping("/api/get/members")
     public ResponseEntity<GetMemberDto> getMembers(Authentication authentication) {
         log.info(authentication.getName());
         return memberService.getMembers(authentication);
     }
 
-    @Operation(summary = "로그아웃", description = "Refresh 쿠키를 null로 만듭니다.")
+    @Operation(summary = "로그아웃", description = "Refresh 쿠키를 null로 만듭니다. \n따로 보낼 것은 없습니다.")
     @DeleteMapping("/api/logout")
     public void removeCookie(HttpServletResponse response) {
         Cookie myCookie = new Cookie("refreshToken", null);
@@ -66,7 +68,7 @@ public class MemberController {
         response.addCookie(myCookie);
     }
 
-    @Operation(summary = "Refresh Cookie를 통해 accessToken 재발급", description = "재발급 받은 accessToken을 Header로 저장하고 다른 API를 호출하여야 합니다.")
+    @Operation(summary = "Refresh Cookie를 통해 accessToken 재발급", description = "RefreshToken을 넘기면 새로운 accessToken을 발급해줍니다.")
     @GetMapping("/api/get/accessToken")
     public HttpServletResponse getAccessToken(HttpServletRequest request,
                                               HttpServletResponse response) throws IOException {

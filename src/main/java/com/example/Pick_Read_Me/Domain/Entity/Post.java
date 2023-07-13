@@ -19,7 +19,7 @@ import java.util.List;
 public class Post {
     @Id
     @Column(name = "postId")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name="title", nullable = false)

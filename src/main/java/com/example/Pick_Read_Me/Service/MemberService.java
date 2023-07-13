@@ -29,6 +29,7 @@ public class MemberService {
 
     @Autowired
     private MemberRepository memberRepository;
+    //회원 정보를 조회해서 반환합니다
     public ResponseEntity<GetMemberDto> getMembers(Authentication authentication) {
         Long github_id = Long.valueOf(authentication.getName());
         Member member = memberRepository.findById(Long.valueOf(github_id))
