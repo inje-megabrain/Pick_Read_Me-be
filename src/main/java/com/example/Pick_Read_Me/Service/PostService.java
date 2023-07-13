@@ -241,11 +241,12 @@ public class PostService {
     }
 
 
-    public Slice<GetPostDto> searchByPost(Long lastPostId, Pageable pageable) {
-
+    public Slice<GetPostDto> searchByPost(Long page_number, Pageable pageable) {
+        Long last_post_id = Long.valueOf(postRepository.findAll().size());
+        last_post_id -= page_number*10;
         List<GetPostDto> results = query.selectFrom(post)
                 .where(
-                        ltPostId(lastPostId)
+                        ltPostId(last_post_id)
                 )
                 .orderBy(post.id.desc()) // post_id를 내림차순으로 정렬
                 .limit(pageable.getPageSize() + 1)

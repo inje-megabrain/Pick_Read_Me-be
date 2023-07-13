@@ -120,18 +120,15 @@ public class PostController {
     }
 
     @Operation(summary = "게시글 무한스크롤 API", description = "예시)" +
-            "/api/get/rand/posts?last_post=50이면 50번부터 40번까지의 글이 조호됩니다.")
-    @GetMapping("/get/rand/posts")
-    public Slice<GetPostDto> getPosts(@RequestParam("last_post") Long last_post) {
-        return postService.searchByPost(last_post, PageRequest.ofSize(10));
+            "/api/get/infinity/posts?page_number=1이면 마지막글부터 마지막글-10번까지의 글이 조회됩니다.")
+    @GetMapping("/get/infinity/posts")
+    public Slice<GetPostDto> getPosts(@RequestParam("page_number") Long page_number) {
+        return postService.searchByPost(page_number, PageRequest.ofSize(10));
     }
 
-    @Operation(summary = "마지막 게시글을 확인할 수 있는 API", description = "마지막 게시글 번호를 확인할 수 있습니다.")
-    @GetMapping("/get/last/post_id")
-    public ResponseEntity<Integer> getLastPostId() {
-        return new ResponseEntity<Integer>(postRepository.findAll().size(), HttpStatus.OK);
-    }
 
+    //
+    //
     @Operation(summary = "게시글 목록에서 선택하면 상세보기하는 API", description = "예시)" +
             "/api/get/detail/post?post_id=5 5번게시글을 상세 조회할 수 있습니다")
     @GetMapping("/get/detail/post")
