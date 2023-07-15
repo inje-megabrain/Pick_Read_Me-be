@@ -106,7 +106,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             refreshRepository.save(checkIp);
 
             log.info("{}", token);
-            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("/home")
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("/api/home")
                     .queryParam("accessToken", token.getAccessToken())
                     .queryParam("refreshToken", token.getRefreshToken());
             String redirectUrl = uriBuilder.toUriString();
