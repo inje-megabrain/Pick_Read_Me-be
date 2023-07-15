@@ -1,5 +1,6 @@
 package com.example.Pick_Read_Me.Controller;
 
+import com.example.Pick_Read_Me.Domain.Dto.CustomSlice.CustomSliceResponseDto;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.GetPostDto;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.PostsDTO;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.SelectAllPost;
@@ -13,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.batik.transcoder.TranscoderException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -51,7 +50,7 @@ public class PostController {
         return html;
     }
 
-    @Operation(summary = "자기글 무한 스크롤(AccessToken 필수)",
+    @Operation(summary = "자기글 모두 조회하는 API(AccessToken 필수)",
             description = "자기글을 모두 조회합니다.")
     @GetMapping("/get/searchMyPosts")
     public List<GetPostDto> getMyPosts(Authentication authentication) {
@@ -91,10 +90,6 @@ public class PostController {
         return selectAllPosts;
     }
 
-
-
-
-
     @Operation(summary = "사용자의 글 한 개를 조회하는 API", description = "예시) /api/get/posts?post_id=5를 URL로 호출하면 5번째 글을 조회합니다.")
     @GetMapping("/get/posts")
     public ResponseEntity<GetPostDto> selectPost(@RequestParam("post_id") Long post_id) {
@@ -128,9 +123,10 @@ public class PostController {
     }
 
     @Operation(summary = "게시글 무한스크롤 API", description = "예시)" +
-            "/api/get/infinity/posts?page_number=1이면 마지막글부터 마지막글-10번까지의 글이 조회됩니다.")
+            "/api/get/infinity/posts?page_number=1이면 첫번째 페이지가 조회됩니다.\n"+
+             "nowPage = 현재 페이지, totalPage = 전체 피이지 countContent = 현재 조회한 글 갯수입니당~\n")
     @GetMapping("/get/infinity/posts")
-    public Slice<GetPostDto> getPosts(@RequestParam("page_number") Long page_number) {
+    public CustomSliceResponseDto getPosts(@RequestParam("page_number") Long page_number) {
         return postService.searchByPost(page_number, PageRequest.ofSize(10));
     }
 

@@ -1,8 +1,10 @@
 package com.example.Pick_Read_Me.Service;
 
+import com.example.Pick_Read_Me.Domain.Dto.CustomSlice.CustomSliceResponseDto;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.GetPostDto;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.PostsDTO;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.SelectAllPost;
+
 import com.example.Pick_Read_Me.Domain.Entity.Member;
 import com.example.Pick_Read_Me.Domain.Entity.Post;
 import com.example.Pick_Read_Me.Exception.MemberNotFoundException;
@@ -10,7 +12,6 @@ import com.example.Pick_Read_Me.Jwt.JwtProvider;
 import com.example.Pick_Read_Me.Repository.MemberRepository;
 import com.example.Pick_Read_Me.Repository.PostRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.batik.transcoder.TranscoderException;
@@ -20,9 +21,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.*;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -241,9 +240,13 @@ public class PostService {
     }
 
 
-    public Slice<GetPostDto> searchByPost(Long page_number, Pageable pageable) {
+    public CustomSliceResponseDto searchByPost(Long page_number, Pageable pageable) {
         Long last_post_id = Long.valueOf(postRepository.findAll().size());
+        Long totalPage = last_post_id/10;
+        log.info(String.valueOf(last_post_id));
         last_post_id -= page_number*10;
+
+
         List<GetPostDto> results = query.selectFrom(post)
                 .where(
                         ltPostId(last_post_id)
@@ -255,7 +258,15 @@ public class PostService {
                 .map(this::mapToGetPostDto) // Post 엔티티를 GetPostDto로 매핑
                 .collect(Collectors.toList());
 
-        return checkLastPage(pageable, results);
+        List<GetPostDto> content = checkLastPage(pageable, results).getContent();
+        CustomSliceResponseDto custom = new CustomSliceResponseDto(
+                content,
+                page_number,
+                totalPage,
+                content.size()
+        );
+        return custom;
+
     }
 
     // no-offset 방식 처리하는 메서드
