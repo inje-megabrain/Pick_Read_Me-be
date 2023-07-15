@@ -43,7 +43,7 @@ public class SecurityConfig {
             "/swagger-resources/**",
             "/api/home/**",
             "/test",
-            "/login",
+            "/api/login",
             "/home?accessToken=*", //리다이렉트
             "/home\\?accessToken=.*",
             "/test/**",
