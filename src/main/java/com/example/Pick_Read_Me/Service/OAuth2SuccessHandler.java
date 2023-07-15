@@ -32,6 +32,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -68,9 +69,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         log.info("Principal에서 꺼낸 OAuth2User = {}", oAuth2User);
         // 최초 로그인이라면 회원가입 처리를 한다.
-        Member find = memberRepository.findById(userDto.getId()).orElseGet(Member::new);
+        Optional<Member> optionalMember = memberRepository.findById(userDto.getId());
         Refresh checkIp = refreshRepository.findById(userDto.getId()).orElseGet(Refresh::new);
-        if(find!=null) {
+        if (optionalMember.isPresent()) {
+            Member find = optionalMember.get();
             log.info("업데이트");
             log.info("토큰 발행 시작");
 
@@ -110,7 +112,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             String redirectUrl = uriBuilder.toUriString();
             getRedirectStrategy().sendRedirect(request, response, redirectUrl);
         }
-        else if(find==null){
+        else{
                 String targetUrl;
                 log.info("토큰 발행 시작");
 
