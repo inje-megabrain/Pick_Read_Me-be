@@ -72,7 +72,15 @@ public class PostController {
         return postService.createPost(authentication, postsDTO, file);
     }
 
+    @PostMapping(value = "/post/test/posts")
+    @Operation(summary = "글 작성 Test API", description = "api/post/posts랑 같지만 File을 안 넘겨도 글을 쓸수 있습니다!\n"+"" +
+            "즉 Readme없어도 됨 내가 테스트 할려고 만듬..")
+    public ResponseEntity<Post> createPost(Authentication authentication,
+                                           @ModelAttribute PostsDTO postsDTO) throws IOException, TranscoderException {
 
+        // Post 작성 서비스 호출
+        return postService.createPostTest(authentication, postsDTO);
+    }
 
 
     @Operation(summary = "모든 사용자의 전체 글을 조회하는 API")

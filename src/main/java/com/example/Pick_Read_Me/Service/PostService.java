@@ -391,4 +391,30 @@ public class PostService {
     }
 
 
+    public ResponseEntity<Post> createPostTest(Authentication authentication, PostsDTO postsDTO) {
+        log.info(String.valueOf(authentication));
+        Long github_id = Long.valueOf(authentication.getName());
+        Member member = memberRepository.findById(Long.valueOf(github_id))
+                .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
+
+
+        if (postsDTO.getTitle() == null || postsDTO.getTitle().isEmpty())
+            return ResponseEntity.badRequest().body(null);
+
+        Post post = new Post();
+        post.setContent(postsDTO.getContent());
+        post.setTitle(postsDTO.getTitle());
+        post.setPostCreatedAt(new Date());
+        post.setPostUpdatedAt(new Date());
+        post.setRepo(postsDTO.getRepo());
+        post.setPost_like(0L);
+        post.setMember(member);
+
+        member.getPosts().add(post);
+
+        postRepository.save(post);
+        memberRepository.save(member);
+
+        return ResponseEntity.ok().body(post);
+    }
 }
