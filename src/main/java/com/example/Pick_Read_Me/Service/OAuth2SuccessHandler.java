@@ -41,6 +41,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final MemberRepository userRequestMapper;
     private final ObjectMapper objectMapper;
 
+    /*
+    
+     */
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
