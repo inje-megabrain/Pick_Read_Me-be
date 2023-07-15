@@ -44,16 +44,16 @@ public class SecurityConfig {
             "/home/**",
             "/test",
             "/login",
-            "/home?accessToken=*",
+            "/home?accessToken=*", //리다이렉트
             "/home\\?accessToken=.*",
             "/test/**",
-            "/api/get/accessToken",
-            "/api/logout",
+            "/api/get/accessToken", //새로운 토큰 발급
+            "/api/logout", //로그아웃
             "/test/**",
-            "/api/get/all/posts",
-            "/api/get/rand/posts",
+            "/api/get/all/posts", //모든글 보기
             "/frontend",
-            "/frontend/**",
+            "/frontend/**", //프론트
+            "/api/get/infinity/posts", //무한스크롤
     };
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;

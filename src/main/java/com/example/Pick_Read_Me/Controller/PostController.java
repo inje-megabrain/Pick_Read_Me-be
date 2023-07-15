@@ -127,8 +127,7 @@ public class PostController {
     }
 
 
-    //
-    //
+
     @Operation(summary = "게시글 목록에서 선택하면 상세보기하는 API", description = "예시)" +
             "/api/get/detail/post?post_id=5 5번게시글을 상세 조회할 수 있습니다")
     @GetMapping("/get/detail/post")
