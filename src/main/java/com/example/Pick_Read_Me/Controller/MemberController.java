@@ -75,5 +75,4 @@ public class MemberController {
         return memberService.getAccessToken(request, response);
     }
 
-
 }
