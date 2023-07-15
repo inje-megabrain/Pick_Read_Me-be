@@ -43,7 +43,7 @@ public class SecurityConfig {
             "/swagger-resources/**",
             "/api/home/**",
             "/test",
-            "/api/login",
+            "/api/login", //로그인시 Jwt Filter를 거쳐버림 안 거치게 수정
             "/home?accessToken=*", //리다이렉트
             "/home\\?accessToken=.*",
             "/test/**",

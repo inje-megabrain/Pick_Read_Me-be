@@ -41,10 +41,11 @@ public class MemberController {
     public void home(HttpServletRequest request, HttpServletResponse response,
                      @RequestParam("accessToken") String accessToken,
                      @RequestParam("refreshToken") String refreshToken) throws IOException {
+
         String encodedAccessToken = URLEncoder.encode(accessToken, StandardCharsets.UTF_8);
         String encodedRefreshToken = URLEncoder.encode(refreshToken, StandardCharsets.UTF_8);
         String redirectUrl = "http://localhost:3000/redirect?accessToken=" + encodedAccessToken + "&refreshToken=" + encodedRefreshToken;
-
+        log.info(redirectUrl+"여기로 전송됨");
         // accessToken, refreshToken 등 필요한 작업 수행
 
         response.sendRedirect(redirectUrl);
