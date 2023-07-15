@@ -41,7 +41,7 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/webjars/**",
             "/swagger-resources/**",
-            "/home/**",
+            "/api/home/**",
             "/test",
             "/login",
             "/home?accessToken=*", //리다이렉트
@@ -105,10 +105,10 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login()
                 .authorizationEndpoint()
-                .baseUri("/login")
+                .baseUri("/api/login")
                 .and()
                 .redirectionEndpoint()
-                .baseUri("/auth/code")
+                .baseUri("/api/auth/code")
                 .and()
                 .successHandler(successHandler)
                 .userInfoEndpoint()

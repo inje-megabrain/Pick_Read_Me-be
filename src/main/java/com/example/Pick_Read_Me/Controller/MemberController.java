@@ -37,7 +37,7 @@ public class MemberController {
         return "헉!";
     }
 
-    @GetMapping("/home") //리다이렉트 필수
+    @GetMapping("/api/home") //리다이렉트 필수
     public void home(HttpServletRequest request, HttpServletResponse response,
                      @RequestParam("accessToken") String accessToken,
                      @RequestParam("refreshToken") String refreshToken) throws IOException {

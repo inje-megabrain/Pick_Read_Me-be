@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api")
 @Slf4j
 public class GitHubOAuthController {
 
@@ -37,7 +37,7 @@ public class GitHubOAuthController {
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
 
-    @GetMapping(value = "code")
+    @GetMapping(value = "/auth/code")
     public void getToken(@RequestParam("code") String code) throws Exception {
         log.info("여기서는 CustomOauth2UserService가 요청을 가로챕니다");
     }
