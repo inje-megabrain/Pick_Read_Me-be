@@ -32,7 +32,7 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
 
-  
+
 
     @GetMapping("/api/home") //리다이렉트 필수
     public void home(HttpServletRequest request, HttpServletResponse response,
@@ -48,7 +48,10 @@ public class MemberController {
         response.sendRedirect(redirectUrl);
     }
 
+    @GetMapping("/") //리다이렉트 필수
+    public void test(){
 
+    }
 
     @Operation(summary = "해당 유저 조회", description = "AccessToken을 헤더로 주면 회원정보를 조회합니다.")
     @GetMapping("/api/get/members")
