@@ -48,7 +48,7 @@ public class MemberController {
         response.sendRedirect(redirectUrl);
     }
 
-    @GetMapping("/") //리다이렉트 필수
+    @GetMapping("/h") //리다이렉트 필수
     public void test(){
 
     }
