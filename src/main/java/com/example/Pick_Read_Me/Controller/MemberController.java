@@ -50,7 +50,7 @@ public class MemberController {
 
     @GetMapping("/h") //리다이렉트 필수
     public void test(){
-
+        log.info("Nginx?");
     }
 
     @Operation(summary = "해당 유저 조회", description = "AccessToken을 헤더로 주면 회원정보를 조회합니다.")
