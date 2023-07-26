@@ -41,14 +41,20 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/webjars/**",
             "/swagger-resources/**",
-            "/home/**",
+            "/api/home/**",
             "/test",
-            "/login",
-            "/home?accessToken=*",
+            "/api/login", //로그인시 Jwt Filter를 거쳐버림 안 거치게 수정
+            "/home?accessToken=*", //리다이렉트
             "/home\\?accessToken=.*",
             "/test/**",
-            "/api/get/accessToken",
-            "/api/logout"
+            "/api/get/accessToken", //새로운 토큰 발급
+            "/api/logout", //로그아웃
+            "/test/**",
+            "/api/get/all/posts", //모든글 보기
+            "/frontend",
+            "/frontend/**", //프론트
+            "/api/get/infinity/posts", //무한스크롤
+            "/", //프론트
     };
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
@@ -59,8 +65,8 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    JwtAuthenticationFilter jwtAuthenticationFilter(JwtProvider jwtProvider, CookieUtil cookieUtil, RefreshRepository refreshRepository) {
-        return new JwtAuthenticationFilter(jwtProvider, cookieUtil, refreshRepository);
+    JwtAuthenticationFilter jwtAuthenticationFilter(JwtProvider jwtProvider, RefreshRepository refreshRepository) {
+        return new JwtAuthenticationFilter(jwtProvider,  refreshRepository);
     }
 
     @Bean
@@ -86,8 +92,7 @@ public class SecurityConfig {
 
 
     @Bean
-    protected SecurityFilterChain config(HttpSecurity http, JwtProvider jwtProvider,
-                                         CookieUtil cookieUtil) throws Exception {
+    protected SecurityFilterChain config(HttpSecurity http, JwtProvider jwtProvider) throws Exception {
         http
                 .addFilterBefore(corsFilter(), ChannelProcessingFilter.class)
                 .csrf().disable()
@@ -97,14 +102,14 @@ public class SecurityConfig {
                 //여기는 권한 즉 user,admin 등등 모든 처리를 하겠다는 걸
                 .anyRequest().authenticated()
                 .and()
-                .addFilterBefore(jwtAuthenticationFilter(jwtProvider, cookieUtil, refreshRepository),
+                .addFilterBefore(jwtAuthenticationFilter(jwtProvider,  refreshRepository),
                         UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login()
                 .authorizationEndpoint()
-                .baseUri("/login")
+                .baseUri("/api/login")
                 .and()
                 .redirectionEndpoint()
-                .baseUri("/auth/code")
+                .baseUri("/api/auth/code")
                 .and()
                 .successHandler(successHandler)
                 .userInfoEndpoint()

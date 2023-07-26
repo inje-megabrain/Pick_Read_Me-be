@@ -20,10 +20,13 @@ public class GetMemberDto {
 
     private String email;
 
-    public GetMemberDto(String name, String repo, String profile, String email) {
+    private int postSize;
+
+    public GetMemberDto(String name, String repo, String profile, String email, int postSize) {
         this.name = name;
         this.repo = repo;
         this.profile = profile;
         this.email = email;
+        this.postSize=postSize;
     }
 }

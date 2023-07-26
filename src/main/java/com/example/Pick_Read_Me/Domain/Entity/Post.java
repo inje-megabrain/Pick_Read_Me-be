@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,22 +19,23 @@ import java.util.List;
 public class Post {
     @Id
     @Column(name = "postId")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="title")
+    @Column(name="title", nullable = false)
     private String title;
 
+    @Size(max = 500)
     @Column(name = "content")
     private String content;
 
-    @Column(name = "postCreatedAt")
+    @Column(name = "postCreatedAt", nullable = false)
     private Date postCreatedAt;
 
-    @Column(name = "postUpdateAt")
+    @Column(name = "postUpdateAt", nullable = false)
     private Date postUpdatedAt;
 
-    @Column(name = "repo")
+    @Column(name = "repo", nullable = false)
     private String repo;
 
     @Column(name = "postLike")

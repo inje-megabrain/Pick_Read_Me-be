@@ -28,6 +28,8 @@ repositories {
 }
 
 dependencies {
+
+
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
@@ -79,12 +81,18 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 
+	implementation 'org.xhtmlrenderer:flying-saucer-pdf:9.1.22'
+	implementation 'org.xhtmlrenderer:flying-saucer-core:9.1.22'
+
+	implementation 'org.jodconverter:jodconverter-core:4.4.6'
+	implementation 'org.jsoup:jsoup:1.14.3'
+	implementation 'com.vladsch.flexmark:flexmark-all:0.36.8'
+
+	implementation 'commons-io:commons-io:2.11.0'
 
 
 	//json
-	dependencies {
-		implementation 'com.google.code.gson:gson:2.8.9'
-	}
+	implementation 'com.google.code.gson:gson:2.8.9'
 
 	implementation 'org.bouncycastle:bcprov-jdk15on:1.69'
 	implementation 'org.json:json:20220924'
@@ -113,18 +121,19 @@ dependencies {
 
 
 	//AmaZon
-	implementation 'software.amazon.awssdk:s3:2.17.80'
+	implementation 'software.amazon.awssdk:s3:2.20.68'
 
+	//Svg
+	implementation 'org.apache.xmlgraphics:batik-rasterizer:1.14'
+
+
+	//@Size
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	// 아파치 HTTP 클라이언트 라이브러리 추가
 	//implementation 'org.apache.httpcomponents:httpclient:4.5.14'
 	//implementation 'org.apache.httpcomponents:httpcore:4.4.15'
 	//implementation 'org.apache.httpcomponents:httpcore-nio:4.4.15'
 
-	//Html 랜더링
-	implementation 'org.xhtmlrenderer:flying-saucer-core:9.1.20'
-	implementation 'org.apache.pdfbox:pdfbox:2.0.27'
-	implementation 'ognl:ognl:3.3.3'
-	implementation 'org.jsoup:jsoup:1.15.4'
 
 }
 tasks.named('test') {
