@@ -140,4 +140,8 @@ public class PostController {
         return postService.getDetailPost(authentication, post_id);
     }
 
+    @PostMapping("/Thumbnail")
+    public ResponseEntity<String> makeThumbnail(@RequestParam String name) {
+        return postService.makeThumbnail(name);
+    }
 }

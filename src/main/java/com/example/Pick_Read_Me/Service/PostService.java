@@ -428,4 +428,9 @@ public class PostService {
 
         return ResponseEntity.ok().body(post);
     }
+
+    public ResponseEntity<String> makeThumbnail(String name) {
+        byte[] by = svgService.makeThumbnail(name);
+
+    }
 }
