@@ -54,6 +54,7 @@ public class SecurityConfig {
             "/frontend",
             "/frontend/**", //프론트
             "/api/get/infinity/posts", //무한스크롤
+            "/api/Thumbnail",
             "/", //프론트
     };
     @Autowired

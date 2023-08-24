@@ -13,6 +13,7 @@ public class CustomSliceResponseDto<T> {
     private Long totalPage;
     private int countContent;
 
+
     public CustomSliceResponseDto(List<GetPostDto> content, Long nowPage, Long totalPage,
                                   int countContent) {
         this.content = content;

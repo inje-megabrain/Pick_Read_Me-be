@@ -25,8 +25,9 @@ ext {
 }
 repositories {
 	mavenCentral()
+	maven {
+		url "https://repository.aspose.com/repo/" }
 }
-
 dependencies {
 
 
@@ -103,7 +104,7 @@ dependencies {
 	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-
+	implementation group: 'org.apache.xmlgraphics', name: 'batik-transcoder', version: '1.14'
 	//jooq
 	implementation 'org.jooq:jooq:3.15.3'
 	implementation 'org.jooq:jooq-meta:3.15.3'
@@ -122,9 +123,9 @@ dependencies {
 	//AmaZon
 	implementation 'software.amazon.awssdk:s3:2.20.68'
 
-	//Svg
-	implementation 'org.apache.xmlgraphics:batik-rasterizer:1.14'
 
+
+	implementation group: 'com.aspose', name: 'aspose-imaging', version: '23.7', classifier: 'jdk16'
 
 	//@Size
 	implementation 'org.springframework.boot:spring-boot-starter-validation'

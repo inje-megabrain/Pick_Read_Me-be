@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class GetPostDto {
+public class GetInfinityDto {
     private Long id;
 
     private String title;
@@ -23,8 +23,10 @@ public class GetPostDto {
     private Date create_time;
     private Date update_time;
 
+    private String svgUrl;
 
-    public GetPostDto(Long id, String title, String content, String repo, Long post_like, String owner, Date create_time, Date update_time) {
+    public GetInfinityDto(Long id, String title, String content, String repo, Long post_like, String owner,
+                          Date create_time, Date update_time, String svgUrl) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -33,7 +35,7 @@ public class GetPostDto {
         this.owner = owner;
         this.create_time = create_time;
         this.update_time = update_time;
-
+        this.svgUrl = svgUrl;
     }
 
 

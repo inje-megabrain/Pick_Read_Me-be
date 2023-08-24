@@ -9,6 +9,7 @@ public class PickReadMeApplication {
 
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(PickReadMeApplication.class, args);
 	}
 

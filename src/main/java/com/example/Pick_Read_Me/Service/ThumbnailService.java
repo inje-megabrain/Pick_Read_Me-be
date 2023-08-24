@@ -20,7 +20,7 @@ public class ThumbnailService {
     @Autowired
     private S3Client s3Client;
 
-    @Value("${aws.credentials.bucket-name}")
+    @Value("${cloud.aws.credentials.bucket-name}")
     private String bucket;
 
     public void saveThumbnailToS3(byte[] thumbnailData, String fileName) {

@@ -1,6 +1,7 @@
 package com.example.Pick_Read_Me.Service;
 
 import com.example.Pick_Read_Me.Domain.Dto.CustomSlice.CustomSliceResponseDto;
+import com.example.Pick_Read_Me.Domain.Dto.PostDto.GetInfinityDto;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.GetPostDto;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.PostsDTO;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.SelectAllPost;
@@ -63,7 +64,7 @@ public class PostService {
     @Autowired
     private S3Client s3Client;
 
-    @Value("${aws.credentials.bucket-name}")
+    @Value("${cloud.aws.credentials.bucket-name}")
     private String bucket;
 
     @Value("${baseurl}")
@@ -139,7 +140,7 @@ public class PostService {
 
         postRepository.save(post);
         memberRepository.save(member);
-        svgService.convertToSvg(file);
+        svgService.convertToSvg(file, postsDTO.getTitle());
 
         return ResponseEntity.ok().body(post);
     }
@@ -240,25 +241,38 @@ public class PostService {
     }
 
 
-    public CustomSliceResponseDto searchByPost(Long page_number, Pageable pageable) {
+    public CustomSliceResponseDto searchByPost(Long page_number, Pageable pageable, boolean check) {
         Long last_post_id = Long.valueOf(postRepository.findAll().size());
         Long totalPage = last_post_id/10;
         log.info(String.valueOf(last_post_id));
         last_post_id -= page_number*10;
+        List<GetInfinityDto> results = null;
 
-
-        List<GetPostDto> results = query.selectFrom(post)
-                .where(
-                        ltPostId(last_post_id)
-                )
-                .orderBy(post.id.desc()) // post_id를 내림차순으로 정렬
-                .limit(pageable.getPageSize() + 1)
-                .fetch()
-                .stream()
-                .map(this::mapToGetPostDto) // Post 엔티티를 GetPostDto로 매핑
-                .collect(Collectors.toList());
-
-        List<GetPostDto> content = checkLastPage(pageable, results).getContent();
+        if (check==false) {
+            results = query.selectFrom(post)
+                    .where(
+                            ltPostId(last_post_id)
+                    )
+                    .orderBy(post.id.desc()) // post_id를 내림차순으로 정렬
+                    .limit(pageable.getPageSize() + 1)
+                    .fetch()
+                    .stream()
+                    .map(this::mapToGetPostDto) // Post 엔티티를 GetPostDto로 매핑
+                    .collect(Collectors.toList());
+        } else if (check == true ) {
+           results = query.selectFrom(post)
+                    .where(
+                            ltPostId(last_post_id)
+                    )
+                    .orderBy(post.post_like.desc()) // post_id를 내림차순으로 정렬
+                    .limit(pageable.getPageSize() + 1)
+                    .fetch()
+                    .stream()
+                    .map(this::mapToGetPostDto) // Post 엔티티를 GetPostDto로 매핑
+                    .collect(Collectors.toList());
+        }
+      
+        List<GetInfinityDto> content = checkLastPage(pageable, results).getContent();
         CustomSliceResponseDto custom = new CustomSliceResponseDto(
                 content,
                 page_number,
@@ -279,7 +293,7 @@ public class PostService {
     }
 
     // 무한 스크롤 방식 처리하는 메서드
-    private Slice<GetPostDto> checkLastPage(Pageable pageable, List<GetPostDto> results) {
+    private Slice<GetInfinityDto> checkLastPage(Pageable pageable, List<GetInfinityDto> results) {
 
         boolean hasNext = false;
 
@@ -310,9 +324,10 @@ public class PostService {
         return getPostDtos;
 
     }
-    private GetPostDto mapToGetPostDto(Post post) {
-        GetPostDto getPostDto = new GetPostDto(post.getId(), post.getTitle(),
-                post.getContent(), post.getRepo(), post.getPost_like(), post.getMember().getName(), post.getPostCreatedAt(), post.getPostUpdatedAt());
+    private GetInfinityDto mapToGetPostDto(Post post) {
+        GetInfinityDto getPostDto = new GetInfinityDto(post.getId(), post.getTitle(),
+                post.getContent(), post.getRepo(), post.getPost_like(), post.getMember().getName(), post.getPostCreatedAt(), post.getPostUpdatedAt(),
+                post.getTitle()+".svg");
         return getPostDto;
         // 추가적으로 필요한 데이터를 매핑합니다
     }
@@ -429,8 +444,12 @@ public class PostService {
         return ResponseEntity.ok().body(post);
     }
 
-    public ResponseEntity<String> makeThumbnail(String name) {
-        byte[] by = svgService.makeThumbnail(name);
 
+
+    /*
+    public void makeThumbnail(String name) {
+        String k  = svgService.makeThumbnail(name);
     }
+
+     */
 }

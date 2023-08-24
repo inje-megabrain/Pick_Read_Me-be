@@ -7,6 +7,7 @@ import com.example.Pick_Read_Me.Domain.Dto.PostDto.SelectAllPost;
 import com.example.Pick_Read_Me.Domain.Entity.Post;
 import com.example.Pick_Read_Me.Repository.PostRepository;
 import com.example.Pick_Read_Me.Service.PostService;
+import com.example.Pick_Read_Me.Service.SvgService;
 import com.example.Pick_Read_Me.Util.CommonUtil;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +32,8 @@ public class PostController {
     @Autowired
     private PostRepository postRepository;
 
+    @Autowired
+    private SvgService svgService;
     @Autowired
     private CommonUtil commonUtil;
     @Autowired
@@ -62,7 +65,7 @@ public class PostController {
 
     @PostMapping(value = "/post/posts", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
     @Operation(summary = "글을 작성, Readme를 저장하는 API(AccessToken 필수)", description = "예시) api/post/posts?file=맘대로\n" +
-            "Json을 넘기고 파일을 넘기면 S3에 readme를 저장하고, 글을 저장합니다")
+            "Json을 넘기고 파일을 넘기면 S3에 readme를 저장하고, 글을 저장하고 S3에 저장되어 있는 게시글 ReadMe Url을 줍니다.")
     public ResponseEntity<Post> createPost(Authentication authentication,
                                            @ModelAttribute PostsDTO postsDTO,
                                            @RequestParam("file") MultipartFile file) throws IOException, TranscoderException {
@@ -79,6 +82,7 @@ public class PostController {
 
         // Post 작성 서비스 호출
         return postService.createPostTest(authentication, postsDTO);
+
     }
 
 
@@ -127,7 +131,13 @@ public class PostController {
              "nowPage = 현재 페이지, totalPage = 전체 피이지 countContent = 현재 조회한 글 갯수입니당~\n")
     @GetMapping("/get/infinity/posts")
     public CustomSliceResponseDto getPosts(@RequestParam("page_number") Long page_number) {
-        return postService.searchByPost(page_number, PageRequest.ofSize(10));
+        return postService.searchByPost(page_number, PageRequest.ofSize(10), false);
+    }
+    @Operation(summary = "좋아요가 많은 순으로 게시글을 무한스크롤 조회하는 API", description = "/api/get/like/infinity"+"\n\n" +
+            "좋아요가 최대 한 개 밖에 되지 않음 필요하다면 50개 10개 20개 이런 식으로 DB를 수정해줄 수 있음")
+    @GetMapping("/get/like/infinity")
+    public CustomSliceResponseDto getLikePosts(@RequestParam("page_number") Long page_number) {
+        return postService.searchByPost(page_number, PageRequest.ofSize(10), true);
     }
 
 
@@ -140,8 +150,11 @@ public class PostController {
         return postService.getDetailPost(authentication, post_id);
     }
 
+
     @PostMapping("/Thumbnail")
-    public ResponseEntity<String> makeThumbnail(@RequestParam String name) {
-        return postService.makeThumbnail(name);
+    public void makeThumbnail() {
+        svgService.makeThumbnail("02148bf9-ec43-4fc2-9929-d64172560908.svg");
     }
+
+
 }
