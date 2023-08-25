@@ -327,7 +327,7 @@ public class PostService {
     private GetInfinityDto mapToGetPostDto(Post post) {
         GetInfinityDto getPostDto = new GetInfinityDto(post.getId(), post.getTitle(),
                 post.getContent(), post.getRepo(), post.getPost_like(), post.getMember().getName(), post.getPostCreatedAt(), post.getPostUpdatedAt(),
-                post.getTitle()+".svg");
+                "https://pick-read-me-actions-s3-bucket.s3.ap-northeast-2.amazonaws.com/"+post.getTitle()+".svg");
         return getPostDto;
         // 추가적으로 필요한 데이터를 매핑합니다
     }
