@@ -1,6 +1,7 @@
 package com.example.Pick_Read_Me.Controller;
 
 import com.example.Pick_Read_Me.Domain.Dto.CustomSlice.CustomSliceResponseDto;
+import com.example.Pick_Read_Me.Domain.Dto.PostDto.GetInfinityDto;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.GetPostDto;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.PostsDTO;
 import com.example.Pick_Read_Me.Domain.Dto.PostDto.SelectAllPost;
@@ -147,8 +148,8 @@ public class PostController {
     @Operation(summary = "게시글 목록에서 선택하면 상세보기하는 API", description = "예시)" +
             "/api/get/detail/post?post_id=5 5번게시글을 상세 조회할 수 있습니다")
     @GetMapping("/get/detail/post")
-    public GetPostDto getDetailPost(Authentication authentication,
-                              @RequestParam Long post_id) {
+    public GetInfinityDto getDetailPost(Authentication authentication,
+                                        @RequestParam Long post_id) {
         return postService.getDetailPost(authentication, post_id);
     }
 

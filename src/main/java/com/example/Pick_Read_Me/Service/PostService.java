@@ -8,7 +8,6 @@ import com.example.Pick_Read_Me.Domain.Dto.PostDto.SelectAllPost;
 
 import com.example.Pick_Read_Me.Domain.Entity.Member;
 import com.example.Pick_Read_Me.Domain.Entity.Post;
-import com.example.Pick_Read_Me.Domain.Entity.PostLike;
 import com.example.Pick_Read_Me.Exception.MemberNotFoundException;
 import com.example.Pick_Read_Me.Jwt.JwtProvider;
 import com.example.Pick_Read_Me.Repository.MemberRepository;
@@ -397,13 +396,30 @@ public class PostService {
 
 
 
-    public GetPostDto getDetailPost(Authentication authentication, Long post_id) {
+    public GetInfinityDto getDetailPost(Authentication authentication, Long post_id) {
         Long github_id = Long.valueOf(authentication.getName());
         Member member = memberRepository.findById(Long.valueOf(github_id))
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + github_id));
+
+        List<Post> k = member.getLikedPosts();
         Post post =  postRepository.findById(post_id).orElseGet(Post::new);
-        GetPostDto getPostDto = new GetPostDto(post.getId(), post.getTitle(), post.getContent(),
-                post.getRepo(), post.getPost_like(), post.getRepo(), post.getPostUpdatedAt(), post.getPostUpdatedAt());
+
+        boolean check =false;
+        if(k!=null) {
+
+            for(int i=0; i<k.size(); i++) {
+                if(k.get(i).getId().equals(post.getId())) {
+                    check =true;
+                }
+            }
+        } else {
+            check = false;
+        }
+
+
+        GetInfinityDto getPostDto = new GetInfinityDto(post.getId(), post.getTitle(),
+                post.getContent(), post.getRepo(), post.getPost_like(), post.getMember().getName(), post.getPostCreatedAt(), post.getPostUpdatedAt(),
+                "https://pick-read-me-actions-s3-bucket.s3.ap-northeast-2.amazonaws.com/"+post.getTitle()+".svg", check);
         return getPostDto;
     }
 
