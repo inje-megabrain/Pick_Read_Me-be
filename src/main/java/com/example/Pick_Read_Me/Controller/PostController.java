@@ -30,6 +30,7 @@ import java.util.List;
 @Api(tags="글 관련 API")
 @RequestMapping("/api")
 @Slf4j
+@CrossOrigin
 public class PostController {
     @Autowired
     private PostRepository postRepository;
