@@ -21,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
@@ -130,14 +131,15 @@ public class PostController {
             "/api/get/infinity/posts?page_number=1이면 첫번째 페이지가 조회됩니다.\n"+
              "nowPage = 현재 페이지, totalPage = 전체 피이지 countContent = 현재 조회한 글 갯수입니당~\n")
     @GetMapping("/get/infinity/posts")
-    public CustomSliceResponseDto getPosts(@RequestParam("page_number") Long page_number) {
-        return postService.searchByPost(page_number, PageRequest.ofSize(10), false);
+    public CustomSliceResponseDto getPosts(@RequestParam("page_number") Long page_number, HttpServletRequest request) {
+
+        return postService.searchByPost(page_number, PageRequest.ofSize(10), false, request);
     }
     @Operation(summary = "좋아요가 많은 순으로 게시글을 무한스크롤 조회하는 API", description = "/api/get/like/infinity"+"\n\n" +
             "좋아요가 최대 한 개 밖에 되지 않음 필요하다면 50개 10개 20개 이런 식으로 DB를 수정해줄 수 있음")
     @GetMapping("/get/like/infinity")
-    public CustomSliceResponseDto getLikePosts(@RequestParam("page_number") Long page_number) {
-        return postService.searchByPost(page_number, PageRequest.ofSize(10), true);
+    public CustomSliceResponseDto getLikePosts(@RequestParam("page_number") Long page_number,  HttpServletRequest request) {
+        return postService.searchByPost(page_number, PageRequest.ofSize(10), true, request);
     }
 
 

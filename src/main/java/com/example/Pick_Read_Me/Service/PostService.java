@@ -8,9 +8,11 @@ import com.example.Pick_Read_Me.Domain.Dto.PostDto.SelectAllPost;
 
 import com.example.Pick_Read_Me.Domain.Entity.Member;
 import com.example.Pick_Read_Me.Domain.Entity.Post;
+import com.example.Pick_Read_Me.Domain.Entity.PostLike;
 import com.example.Pick_Read_Me.Exception.MemberNotFoundException;
 import com.example.Pick_Read_Me.Jwt.JwtProvider;
 import com.example.Pick_Read_Me.Repository.MemberRepository;
+import com.example.Pick_Read_Me.Repository.PostLikeRepository;
 import com.example.Pick_Read_Me.Repository.PostRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -33,6 +35,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,13 +56,17 @@ import static com.example.Pick_Read_Me.Domain.Entity.QPost.post;
 public class PostService {
 
     @Autowired
+    private JwtProvider jwtProvider;
+    @Autowired
     private PostRepository postRepository;
 
     @Autowired
     private MemberRepository memberRepository;
 
     @Autowired
-    private JwtProvider jwtProvider;
+    private PostLikeRepository postLikeRepository;
+
+
 
     @Autowired
     private S3Client s3Client;
@@ -241,14 +248,32 @@ public class PostService {
     }
 
 
-    public CustomSliceResponseDto searchByPost(Long page_number, Pageable pageable, boolean check) {
+    public CustomSliceResponseDto searchByPost(Long page_number, Pageable pageable, boolean check, HttpServletRequest request) {
+        Long github_id = null;
+        boolean doubleCheck = false;
+
+        if (request.getHeader("accessToken")!= null) {
+            log.info("널아님");
+            github_id = Long.valueOf(jwtProvider.getGithubIdFromToken(request.getHeader("accessToken")));
+            log.info("아이디는"+github_id);
+            doubleCheck = true;
+        }
+
         Long last_post_id = Long.valueOf(postRepository.findAll().size());
         Long totalPage = last_post_id/10;
         log.info(String.valueOf(last_post_id));
         last_post_id -= page_number*10;
         List<GetInfinityDto> results = null;
 
-        if (check==false) {
+
+
+
+        if (check==false && doubleCheck == true) {
+            Member member = memberRepository.findById(Long.valueOf(github_id))
+                    .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " ));
+            List<Post> k = member.getLikedPosts();
+
+            log.info(String.valueOf(k));
             results = query.selectFrom(post)
                     .where(
                             ltPostId(last_post_id)
@@ -257,9 +282,12 @@ public class PostService {
                     .limit(pageable.getPageSize() + 1)
                     .fetch()
                     .stream()
-                    .map(this::mapToGetPostDto) // Post 엔티티를 GetPostDto로 매핑
+                    .map(post -> mapToGetPostDto(post, k))
                     .collect(Collectors.toList());
-        } else if (check == true ) {
+        } else if (check == true && doubleCheck==true) {
+            Member member = memberRepository.findById(Long.valueOf(github_id))
+                    .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " ));
+            List<Post> k = member.getLikedPosts();
            results = query.selectFrom(post)
                     .where(
                             ltPostId(last_post_id)
@@ -268,7 +296,29 @@ public class PostService {
                     .limit(pageable.getPageSize() + 1)
                     .fetch()
                     .stream()
-                    .map(this::mapToGetPostDto) // Post 엔티티를 GetPostDto로 매핑
+                   .map(post -> mapToGetPostDto(post, k))
+                    .collect(Collectors.toList());
+        } else if (check == true && doubleCheck==false) {
+            results = query.selectFrom(post)
+                    .where(
+                            ltPostId(last_post_id)
+                    )
+                    .orderBy(post.post_like.desc()) // post_id를 내림차순으로 정렬
+                    .limit(pageable.getPageSize() + 1)
+                    .fetch()
+                    .stream()
+                    .map(post -> mapToGetPostDto(post, null))
+                    .collect(Collectors.toList());
+        } else if (check == false && doubleCheck==false) {
+            results = query.selectFrom(post)
+                    .where(
+                            ltPostId(last_post_id)
+                    )
+                    .orderBy(post.id.desc()) // post_id를 내림차순으로 정렬
+                    .limit(pageable.getPageSize() + 1)
+                    .fetch()
+                    .stream()
+                    .map(post -> mapToGetPostDto(post, null))
                     .collect(Collectors.toList());
         }
       
@@ -324,10 +374,23 @@ public class PostService {
         return getPostDtos;
 
     }
-    private GetInfinityDto mapToGetPostDto(Post post) {
+    private GetInfinityDto mapToGetPostDto(Post post ,List<Post> likes) {
+
+        boolean check =false;
+        if(likes!=null) {
+
+            for(int i=0; i<likes.size(); i++) {
+                if(likes.get(i).getId().equals(post.getId())) {
+                    check =true;
+                }
+            }
+        } else {
+            check = false;
+        }
+
         GetInfinityDto getPostDto = new GetInfinityDto(post.getId(), post.getTitle(),
                 post.getContent(), post.getRepo(), post.getPost_like(), post.getMember().getName(), post.getPostCreatedAt(), post.getPostUpdatedAt(),
-                "https://pick-read-me-actions-s3-bucket.s3.ap-northeast-2.amazonaws.com/"+post.getTitle()+".svg");
+                "https://pick-read-me-actions-s3-bucket.s3.ap-northeast-2.amazonaws.com/"+post.getTitle()+".svg", check);
         return getPostDto;
         // 추가적으로 필요한 데이터를 매핑합니다
     }

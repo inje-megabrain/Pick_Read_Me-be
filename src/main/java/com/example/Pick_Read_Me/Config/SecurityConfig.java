@@ -56,6 +56,7 @@ public class SecurityConfig {
             "/api/get/infinity/posts", //무한스크롤
             "/api/Thumbnail",
             "/", //프론트
+            "/api/get/like/infinity",
     };
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
