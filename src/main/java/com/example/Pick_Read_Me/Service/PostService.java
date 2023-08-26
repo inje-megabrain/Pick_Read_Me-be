@@ -262,6 +262,7 @@ public class PostService {
         Long totalPage = last_post_id/10;
         log.info(String.valueOf(last_post_id));
         last_post_id -= page_number*10;
+        log.info(String.valueOf(last_post_id));
         List<GetInfinityDto> results = null;
 
 
@@ -275,7 +276,7 @@ public class PostService {
             log.info(String.valueOf(k));
             results = query.selectFrom(post)
                     .where(
-                            ltPostId(last_post_id)
+                            ltPostId(last_post_id+1)
                     )
                     .orderBy(post.id.desc()) // post_id를 내림차순으로 정렬
                     .limit(pageable.getPageSize() + 1)
@@ -289,7 +290,7 @@ public class PostService {
             List<Post> k = member.getLikedPosts();
            results = query.selectFrom(post)
                     .where(
-                            ltPostId(last_post_id)
+                            ltPostId(last_post_id+1)
                     )
                     .orderBy(post.post_like.desc()) // post_id를 내림차순으로 정렬
                     .limit(pageable.getPageSize() + 1)
@@ -300,7 +301,7 @@ public class PostService {
         } else if (check == true && doubleCheck==false) {
             results = query.selectFrom(post)
                     .where(
-                            ltPostId(last_post_id)
+                            ltPostId(last_post_id+1)
                     )
                     .orderBy(post.post_like.desc()) // post_id를 내림차순으로 정렬
                     .limit(pageable.getPageSize() + 1)
@@ -311,7 +312,7 @@ public class PostService {
         } else if (check == false && doubleCheck==false) {
             results = query.selectFrom(post)
                     .where(
-                            ltPostId(last_post_id)
+                            ltPostId(last_post_id+1)
                     )
                     .orderBy(post.id.desc()) // post_id를 내림차순으로 정렬
                     .limit(pageable.getPageSize() + 1)
