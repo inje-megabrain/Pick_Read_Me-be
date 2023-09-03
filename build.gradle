@@ -1,22 +1,159 @@
+
+
 plugins {
+	id 'org.springframework.boot' version '2.7.7'
+	id 'io.spring.dependency-management' version '1.0.14.RELEASE'
 	id 'java'
-	id 'org.springframework.boot' version '2.7.11'
-	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+jar {
+	enabled = false;
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
 
+sourceCompatibility = '11'
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+ext {
+	set('springCloudVersion', "2022.0.1")
+}
 repositories {
 	mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-}
 
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+
+	// queryDSL 설정
+	implementation "com.querydsl:querydsl-jpa"
+	implementation "com.querydsl:querydsl-core"
+	implementation "com.querydsl:querydsl-collections"
+	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa" // querydsl JPAAnnotationProcessor 사용 지정
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api" // java.lang.NoClassDefFoundError (javax.annotation.Generated) 대응 코드
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api" // java.lang.NoClassDefFoundError (javax.annotation.Entity) 대응 코드
+
+
+	implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+	//Database
+	implementation 'mysql:mysql-connector-java:8.0.33'
+	runtimeOnly 'mysql:mysql-connector-java:8.0.33'
+	implementation 'com.h2database:h2'
+	runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc'
+	runtimeOnly 'com.h2database:h2'
+
+
+	//Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	//Test
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.junit.platform:junit-platform-launcher:1.5.2'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
+
+	//Jwt
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+	implementation 'com.auth0:java-jwt:4.3.0'
+
+	implementation 'io.netty:netty-resolver-dns-native-macos:4.1.68.Final:osx-aarch_64'
+
+	// Spring Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
+	// OAuth 2.0
+	implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
+
+	//webClient
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+
+	implementation 'org.xhtmlrenderer:flying-saucer-pdf:9.1.22'
+	implementation 'org.xhtmlrenderer:flying-saucer-core:9.1.22'
+
+	implementation 'org.jodconverter:jodconverter-core:4.4.6'
+	implementation 'org.jsoup:jsoup:1.14.3'
+	implementation 'com.vladsch.flexmark:flexmark-all:0.36.8'
+
+	implementation 'commons-io:commons-io:2.11.0'
+
+
+	//json
+	implementation 'com.google.code.gson:gson:2.8.9'
+
+	implementation 'org.bouncycastle:bcprov-jdk15on:1.69'
+	implementation 'org.json:json:20220924'
+	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
+
+	//Mapper
+	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+	//jooq
+	implementation 'org.jooq:jooq:3.15.3'
+	implementation 'org.jooq:jooq-meta:3.15.3'
+	implementation 'org.jooq:jooq-codegen:3.15.3'
+
+	//Swagger
+	implementation 'io.springfox:springfox-boot-starter:3.0.0'
+	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+
+	//MarkDown
+	implementation 'org.commonmark:commonmark:0.18.2'
+
+	//썸네일
+	implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.14'
+
+
+	//AmaZon
+	implementation 'software.amazon.awssdk:s3:2.20.68'
+
+	//Svg
+	implementation 'org.apache.xmlgraphics:batik-rasterizer:1.14'
+
+
+	//@Size
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	// 아파치 HTTP 클라이언트 라이브러리 추가
+	//implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+	//implementation 'org.apache.httpcomponents:httpcore:4.4.15'
+	//implementation 'org.apache.httpcomponents:httpcore-nio:4.4.15'
+
+
+}
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// Querydsl 설정부
+def generated = 'src/main/generated'
+
+// querydsl QClass 파일 생성 위치를 지정
+tasks.withType(JavaCompile) {
+	options.getGeneratedSourceOutputDirectory().set(file(generated))
+}
+
+// java source set 에 querydsl QClass 위치 추가
+sourceSets {
+	main.java.srcDirs += [ generated ]
+}
+
+// gradle clean 시에 QClass 디렉토리 삭제
+clean {
+	delete file(generated)
 }
